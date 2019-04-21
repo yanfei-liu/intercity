@@ -1,0 +1,3 @@
+﻿mvn install -Dmaven.test.skip=true
+
+-Dfile.encoding=utf-8
