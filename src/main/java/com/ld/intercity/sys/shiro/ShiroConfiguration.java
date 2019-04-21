@@ -86,16 +86,8 @@ public class ShiroConfiguration {
 //拦截器
         Map<String, String> filterChainDefinitionMap = new LinkedHashMap<>();
         filterChainDefinitionMap.put("/", "anon");
-        filterChainDefinitionMap.put("/swagger**", "anon");
-        filterChainDefinitionMap.put("/swagger**/**", "anon");
-        filterChainDefinitionMap.put("/webjars/**", "anon");
         filterChainDefinitionMap.put("/v2/**", "anon");
         filterChainDefinitionMap.put("/login/**", "anon");
-        filterChainDefinitionMap.put("/file/**", "anon");
-        filterChainDefinitionMap.put("/websocket", "anon");
-        filterChainDefinitionMap.put("/**.jpg", "anon");
-        filterChainDefinitionMap.put("/**.png", "anon");
-        filterChainDefinitionMap.put("/**.gif", "anon");
         filterChainDefinitionMap.put("/favicon.ico", "anon");
         filterChainDefinitionMap.put("/**", "statelessAuthcFilter");
         shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);
