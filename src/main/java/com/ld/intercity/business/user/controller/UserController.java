@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
  * @Author Dong-Liu
  * @Date 2019/4/20 20:16
  **/
-@Api(value = "用户接口",tags = "用户基本资料操作接口")
+@Api(value = "用户接口", tags = "用户基本资料操作接口")
 @RestController
 @RequestMapping("/user")
 public class UserController {
@@ -28,6 +28,13 @@ public class UserController {
     @RequestMapping(value = "/user/{uuid}", method = RequestMethod.GET)
     public ResponseResult<UserModel> getById(@ApiParam(value = "数据id", required = true)
                                              @PathVariable("uuid") String uuid) throws Exception {
+        return service.getById(uuid);
+    }
+
+    @ApiOperation(value = "查询用户2", notes = "根据用户id查询用户资料2")
+    @RequestMapping(value = "/user2/{uuid}", method = RequestMethod.GET)
+    public ResponseResult<UserModel> getById2(@ApiParam(value = "数据id", required = true)
+                                              @PathVariable("uuid") String uuid) throws Exception {
         return service.getById(uuid);
     }
 
