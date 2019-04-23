@@ -1,4 +1,4 @@
-package com.ld.intercity.business.login.model;
+package com.ld.intercity.business.backlogin.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.annotations.ApiModel;

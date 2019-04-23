@@ -31,13 +31,6 @@ public class UserController {
         return service.getById(uuid);
     }
 
-    @ApiOperation(value = "查询用户2", notes = "根据用户id查询用户资料2")
-    @RequestMapping(value = "/user2/{uuid}", method = RequestMethod.GET)
-    public ResponseResult<UserModel> getById2(@ApiParam(value = "数据id", required = true)
-                                              @PathVariable("uuid") String uuid) throws Exception {
-        return service.getById(uuid);
-    }
-
     @ApiOperation(value = "修改用户", notes = "根据id修改用户资料")
     @RequestMapping(value = "/user/{uuid}", method = RequestMethod.PUT)
     public ResponseResult<UserModel> updateById(@ApiParam(value = "数据id", required = true)

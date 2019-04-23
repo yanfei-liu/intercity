@@ -1,6 +1,6 @@
-package com.ld.intercity.business.login.controller;
+package com.ld.intercity.business.userlogin.controller;
 
-import com.ld.intercity.business.login.model.LoginModel;
+import com.ld.intercity.business.backlogin.model.LoginModel;
 import com.ld.intercity.utils.ResponseResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -17,11 +17,11 @@ import javax.validation.Valid;
 /**
  * @author LD
  */
-@Api(tags = "登陆接口")
+@Api(tags = "用户登陆接口，当用户打开小程序时自动登陆")
 @Slf4j
 @RestController
-@RequestMapping("/login")
-public class LoginController {
+@RequestMapping("/userLogin")
+public class UserLoginController {
 
 //    @Autowired
 //    private AccountService accountService;
