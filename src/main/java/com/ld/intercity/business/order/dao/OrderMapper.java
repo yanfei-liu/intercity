@@ -1,5 +1,6 @@
 package com.ld.intercity.business.order.dao;
 
+import com.github.pagehelper.Page;
 import com.ld.intercity.business.order.model.OrderModel;
 import org.apache.ibatis.annotations.*;
 
@@ -8,7 +9,7 @@ import java.util.List;
 @Mapper
 public interface OrderMapper {
     @Insert("insert into order_table (" +
-            "#{o.orderSn},#{o.placeOfDeparture},#{o.destination},#{o.departureTime},#{o.presionNumber},#{o.orderAmount}," +
+            "#{o.orderSn},#{o.createPresion},#{o.placeOfDeparture},#{o.destination},#{o.departureTime},#{o.presionNumber},#{o.orderAmount}," +
             "#{o.orderTime},#{o.orderType},#{o.settingTime},#{o.settingPresion}" +
             ")")
     int save(@Param("o") OrderModel orderModel);
@@ -29,7 +30,8 @@ public interface OrderMapper {
     @Update("update order_table set " +
             "place_of_departure = #{o.placeOfDeparture},destination = #{o.destination},departure_time = #{o.departureTime}" +
             ",presion_number = #{o.presionNumber},order_amount = #{o.orderAmount},order_time = #{o.orderTime}" +
-            ",order_type = #{o.orderType},setting_time = #{o.settingTime},setting_presion = #{o.settingPresion}")
+            ",jie_dan_presion = #{o.jieDanPresion},jie_dan_time = #{o.jieDanTime},order_type = #{o.orderType}" +
+            ",setting_time = #{o.settingTime},setting_presion = #{o.settingPresion}")
     int update(@Param("o") OrderModel orderModel);
 
     /**
@@ -53,7 +55,7 @@ public interface OrderMapper {
             ",presion_number as presionNumber,order_amount as orderAmount,order_time as orderTime" +
             ",order_type as orderType,setting_time as settingTime,setting_presion as settingPresion" +
             " from order_table where type = #{type}")
-    List<OrderModel> findAllByType(@Param("type") String type);
+    Page<OrderModel> findAllByType(@Param("type") String type);
 
     /**
      * 根据订单号查询单个订单

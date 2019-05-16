@@ -1,12 +1,18 @@
 package com.ld.intercity.business.order.service.serviceImpl;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.ld.intercity.business.order.dao.OrderMapper;
 import com.ld.intercity.business.order.model.OrderModel;
 import com.ld.intercity.business.order.service.OrderService;
+import com.ld.intercity.business.user.model.UserModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -16,7 +22,10 @@ public class OrderServiceImpl implements OrderService {
     private OrderMapper orderMapper;
     @Override
     @Transactional
-    public int save(OrderModel orderModel) {
+    public int save(OrderModel orderModel
+            ,HttpServletRequest request) {
+        UserModel user = (UserModel) request.getSession().getAttribute("user");
+        orderModel.setCreatePresion(user.getUuid());
         return orderMapper.save(orderModel);
     }
 
@@ -33,13 +42,30 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional
+    public int updateJieDan(String orderSn, HttpServletRequest request) {
+        UserModel user = (UserModel) request.getSession().getAttribute("user");
+        OrderModel oneByOrderSn = getOneByOrderSn(orderSn);
+        oneByOrderSn.setJieDanPresion(user.getUuid());
+        oneByOrderSn.setJieDanTime(new Date());
+        return update(oneByOrderSn);
+    }
+
+    @Override
     public List<OrderModel> findAll() {
         return orderMapper.findAll();
     }
 
     @Override
-    public List<OrderModel> findAllByType(String type) {
-        return orderMapper.findAllByType(type);
+    public PageInfo<OrderModel> findAllByType(int pageNow,int pageSize,String type) {
+        PageHelper.startPage(pageNow,pageSize);
+        Page<OrderModel> allByType = orderMapper.findAllByType(type);
+        if (allByType!=null){
+            PageInfo<OrderModel> orderModelPageInfo = new PageInfo<>(allByType);
+            return orderModelPageInfo;
+        }else {
+            return null;
+        }
     }
 
     @Override

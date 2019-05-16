@@ -1,7 +1,9 @@
 package com.ld.intercity.business.order.service;
 
+import com.github.pagehelper.PageInfo;
 import com.ld.intercity.business.order.model.OrderModel;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 public interface OrderService {
@@ -10,7 +12,7 @@ public interface OrderService {
      * @param orderModel 订单实体类
      * @return int
      */
-    int save(OrderModel orderModel);
+    int save(OrderModel orderModel,HttpServletRequest request);
 
     /**
      * 删除订单
@@ -27,6 +29,13 @@ public interface OrderService {
     int update(OrderModel orderModel);
 
     /**
+     * 接单
+     * @param orderSn 订单编号
+     * @return int
+     */
+    int updateJieDan(String orderSn, HttpServletRequest request);
+
+    /**
      * 查询全部订单
      * @return list
      */
@@ -37,7 +46,7 @@ public interface OrderService {
      * @param type 类型：0-已下单未接单 1-未开始已接单  2-已开始未结算 3-已结束已结算   4-已取消
      * @return
      */
-    List<OrderModel> findAllByType(String type);
+    PageInfo<OrderModel> findAllByType(int pageNow, int pageSize, String type);
 
     /**
      * 根据订单号查询单个订单
