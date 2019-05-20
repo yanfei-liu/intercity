@@ -7,7 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * @Explain
@@ -36,7 +36,7 @@ public class ApplyModel {
     private String ApplicationMaterials;
     //申请时间
     @ApiModelProperty(value = "申请时间", example = "yyyy-MM-dd HH:mm:ss", required = true)
-    private Date createTime;
+    private LocalDateTime createTime;
     //申请进度（0 未进行操作   1：申请通过  2:申请未通过  3：申请已作废）
     @ApiModelProperty(value = "申请进度", example = "0 未进行操作   1：申请通过  2:申请未通过  3：申请已作废", required = true)
     private int progress;
