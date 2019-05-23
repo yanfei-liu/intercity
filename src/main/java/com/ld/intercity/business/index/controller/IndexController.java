@@ -25,4 +25,6 @@ public class IndexController {
     public void index(HttpServletResponse response) throws IOException {
         response.sendRedirect("/swagger-ui.html");
     }
+
+
 }

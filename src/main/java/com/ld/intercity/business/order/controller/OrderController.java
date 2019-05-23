@@ -1,6 +1,7 @@
 package com.ld.intercity.business.order.controller;
 
 import com.github.pagehelper.PageInfo;
+import com.google.gson.Gson;
 import com.ld.intercity.business.order.model.OrderModel;
 import com.ld.intercity.business.order.service.OrderService;
 import com.ld.intercity.utils.yaml.YamlPageUtils;
@@ -12,7 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.List;
+
 @Api(value = "订单接口", tags = "订单相关操作接口")
 @Slf4j
 @RestController
@@ -25,9 +28,17 @@ public class OrderController {
     @ApiOperation(value = "订单生成")
     @RequestMapping(value = "/save",method = RequestMethod.POST)
     @ResponseBody
-    public int save(@RequestBody OrderModel orderModel
+    public String save(@RequestBody OrderModel orderModel
             ,HttpServletRequest request){
-        return service.save(orderModel,request);
+        HashMap<String, String> map = new HashMap<>();
+        int save = service.save(orderModel, request);
+        if (save==1){
+            map.put("success","true");
+        }else {
+            map.put("success","false");
+        }
+        Gson gson = new Gson();
+        return gson.toJson(map);
     }
 
 
@@ -39,8 +50,16 @@ public class OrderController {
     @ApiOperation(value = "删除订单")
     @RequestMapping(value = "/del",method = RequestMethod.GET)
     @ResponseBody
-    public int del(@RequestParam String orderSn){
-        return service.del(orderSn);
+    public String del(@RequestParam String orderSn){
+        HashMap<String, String> map = new HashMap<>();
+        int del = service.del(orderSn);
+        if (del==1){
+            map.put("success","true");
+        }else {
+            map.put("success","false");
+        }
+        Gson gson = new Gson();
+        return gson.toJson(map);
     }
 
     /**
@@ -51,8 +70,16 @@ public class OrderController {
     @ApiOperation(value = "接单")
     @RequestMapping(value = "/updateJieDan",method = RequestMethod.GET)
     @ResponseBody
-    public int updateJieDan(@RequestParam String orderSn, HttpServletRequest request){
-        return service.updateJieDan(orderSn,request);
+    public String updateJieDan(@RequestParam String orderSn, HttpServletRequest request){
+        HashMap<String, String> map = new HashMap<>();
+        int upd = service.updateJieDan(orderSn,request);
+        if (upd==1){
+            map.put("success","true");
+        }else {
+            map.put("success","false");
+        }
+        Gson gson = new Gson();
+        return gson.toJson(map);
     }
 
 
@@ -64,10 +91,18 @@ public class OrderController {
     @ApiOperation(value = "完成订单")
     @RequestMapping(value = "/updateWanCheng",method = RequestMethod.GET)
     @ResponseBody
-    public int updateWanCheng(@RequestParam String orderSn){
+    public String updateWanCheng(@RequestParam String orderSn){
+        HashMap<String, String> map = new HashMap<>();
         OrderModel oneByOrderSn = service.getOneByOrderSn(orderSn);
         oneByOrderSn.setOrderType("3");
-        return service.update(oneByOrderSn);
+        int update = service.update(oneByOrderSn);
+        if (update==1){
+            map.put("success","true");
+        }else {
+            map.put("success","false");
+        }
+        Gson gson = new Gson();
+        return gson.toJson(map);
     }
 
     /**
@@ -78,8 +113,16 @@ public class OrderController {
     @ApiOperation(value = "修改订单")
     @RequestMapping(value = "/update",method = RequestMethod.POST)
     @ResponseBody
-    public int update(@RequestBody OrderModel orderModel){
-        return service.update(orderModel);
+    public String update(@RequestBody OrderModel orderModel){
+        HashMap<String, String> map = new HashMap<>();
+        int update = service.update(orderModel);
+        if (update==1){
+            map.put("success","true");
+        }else {
+            map.put("success","false");
+        }
+        Gson gson = new Gson();
+        return gson.toJson(map);
     }
 
     /**
@@ -89,22 +132,28 @@ public class OrderController {
     @ApiOperation(value = "查询全部订单")
     @RequestMapping(value = "/findAll",method = RequestMethod.GET)
     @ResponseBody
-    public List<OrderModel> findAll(){
-        return service.findAll();
+    public String findAll(){
+        Gson gson = new Gson();
+        List<OrderModel> all = service.findAll();
+        String s = gson.toJson(all);
+        return s;
     }
 
     /**
      * 根据传入状态查询各状态的全部订单
-     * @param type 类型：0-已下单未接单 1-未开始已接单  2-已开始未结算 3-已结束已结算   4-已取消
+     * @param type 类型：0-已下单未接单 1-未开始已接单  2-已开始未结算  3-已结束未结算 4-已结束已结算  5-已取消
      * @return
      */
     @ApiOperation(value = "根据传入状态查询各状态的全部订单")
     @RequestMapping(value = "/findAllByType",method = RequestMethod.GET)
     @ResponseBody
-    public PageInfo<OrderModel> findAllByType(@ApiParam(value = "当前页数", required = true)
+    public String findAllByType(@ApiParam(value = "当前页数", required = true)
                                               @PathVariable("pageNow") int pageNow,
-                                              @RequestParam("type") String type){
-        return service.findAllByType(pageNow, YamlPageUtils.getPageSize(),type);
+                              @RequestParam("type") String type){
+        PageInfo<OrderModel> allByType = service.findAllByType(pageNow, YamlPageUtils.getPageSize(), type);
+        Gson gson = new Gson();
+        String s = gson.toJson(allByType);
+        return s;
     }
 
     /**
@@ -115,7 +164,10 @@ public class OrderController {
     @ApiOperation(value = "根据订单号查询单个订单")
     @RequestMapping(value = "/getOneByOrderSn",method = RequestMethod.GET)
     @ResponseBody
-    public OrderModel getOneByOrderSn(String orderSn){
-        return service.getOneByOrderSn(orderSn);
+    public String getOneByOrderSn(String orderSn){
+        OrderModel oneByOrderSn = service.getOneByOrderSn(orderSn);
+        Gson gson = new Gson();
+        String s = gson.toJson(oneByOrderSn);
+        return s;
     }
 }

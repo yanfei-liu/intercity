@@ -24,6 +24,9 @@ public class OrderModel {
     //创建人
     @ApiModelProperty(value = "创建人", example = "创建人Uuid", required = true)
     private String createPresion;
+    //创建人称谓
+    @ApiModelProperty(value = "创建人称谓", example = "陈先生", required = true)
+    private String createName;
     //出发地
     @ApiModelProperty(value = "出发地点", example = "省-市-区/县", required = true)
     private String placeOfDeparture;
