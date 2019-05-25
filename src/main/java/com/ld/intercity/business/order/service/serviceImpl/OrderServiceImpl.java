@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @Transactional(readOnly = true)
@@ -26,6 +27,7 @@ public class OrderServiceImpl implements OrderService {
             ,HttpServletRequest request) {
         UserModel user = (UserModel) request.getSession().getAttribute("user");
         orderModel.setCreatePresion(user.getUuid());
+        orderModel.setUuid(UUID.randomUUID().toString());
         return orderMapper.save(orderModel);
     }
 

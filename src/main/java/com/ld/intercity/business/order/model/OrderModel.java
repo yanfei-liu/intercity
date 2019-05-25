@@ -19,6 +19,8 @@ import java.util.Date;
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class OrderModel {
+    @ApiModelProperty(value = "主键",example = "后台自动生成",required = true)
+    private String uuid;
     @ApiModelProperty(value = "订单编号", example = "由后台自动生成,生成时间的long类型数值", required = true)
     private String orderSn;
     //创建人
