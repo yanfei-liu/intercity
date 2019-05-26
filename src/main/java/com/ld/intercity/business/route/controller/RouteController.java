@@ -7,10 +7,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -29,28 +26,28 @@ public class RouteController {
     }
 
     @ApiOperation(value = "保存")
-    @RequestMapping("/save")
+    @RequestMapping(value = "/save",method = RequestMethod.POST)
     @ResponseBody
     public int save(RouteModel routeModel){
         return service.save(routeModel);
     }
 
     @ApiOperation(value = "删除")
-    @RequestMapping("/del")
+    @RequestMapping(value = "/del",method = RequestMethod.GET)
     @ResponseBody
     public int del(String uuid){
         return service.del(uuid);
     }
 
     @ApiOperation(value = "修改")
-    @RequestMapping("/update")
+    @RequestMapping(value = "/update",method = RequestMethod.POST)
     @ResponseBody
     public int update(RouteModel routeModel){
         return service.update(routeModel);
     }
 
     @ApiOperation(value = "根据起始和终点目标查询路线信息")
-    @RequestMapping("/getByRegionOneAndRegionTwo")
+    @RequestMapping(value = "/getByRegionOneAndRegionTwo",method = RequestMethod.GET)
     @ResponseBody
     public String getByRegionOneAndRegionTwo(@PathVariable("one") String regionOne,@PathVariable("two") String regionTwo){
         RouteModel byRegionOneAndRegionTwo = service.getByRegionOneAndRegionTwo(regionOne, regionTwo);
@@ -59,7 +56,7 @@ public class RouteController {
     }
 
     @ApiOperation(value = "查询全部")
-    @RequestMapping("/findAll")
+    @RequestMapping(value = "/findAll",method = RequestMethod.GET)
     @ResponseBody
     public String findAll(){
         List<RouteModel> all = service.findAll();

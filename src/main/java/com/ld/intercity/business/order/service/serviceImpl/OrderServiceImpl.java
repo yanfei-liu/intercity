@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -49,7 +50,7 @@ public class OrderServiceImpl implements OrderService {
         UserModel user = (UserModel) request.getSession().getAttribute("user");
         OrderModel oneByOrderSn = getOneByOrderSn(orderSn);
         oneByOrderSn.setJieDanPresion(user.getUuid());
-        oneByOrderSn.setJieDanTime(new Date());
+        oneByOrderSn.setJieDanTime(LocalDateTime.now());
         return update(oneByOrderSn);
     }
 

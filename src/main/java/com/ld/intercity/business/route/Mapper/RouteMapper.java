@@ -9,13 +9,13 @@ import java.util.List;
 public interface RouteMapper {
     @Insert("insert into route_table values (uuid = #{r.uuid},province_one = #{r.provinceOne},city_one = #{r.cityOne},county_one = #{r.countyOne},region_one = #{r.regionOne}," +
             "province_two = #{r.provinceTwo},city_two = #{r.cityTwo},county_two = #{r.countyTwo},region_two = #{r.regionTwo},distance = #{r.distance}," +
-            "company = #{r.company},price = #{r.price,money = #{r.money})")
+            "company = #{r.company},price = #{r.price},money = #{r.money})")
     int save (@Param("r") RouteModel routeModel);
     @Update("update from route_table set del_flag = 1 where uuid = #{u}")
     int del(@Param("u") String uuid);
     @Update("update from route_table set province_one = #{r.provinceOne},city_one = #{r.cityOne},county_one = #{r.countyOne},region_one = #{r.regionOne}," +
             "province_two = #{r.provinceTwo},city_two = #{r.cityTwo},county_two = #{r.countyTwo},region_two = #{r.regionTwo},distance = #{r.distance}," +
-            "company = #{r.company},price = #{r.price,money = #{r.money} where uuid = #{r.uuid}")
+            "company = #{r.company},price = #{r.price},money = #{r.money} where uuid = #{r.uuid}")
     int update(@Param("r") RouteModel routeModel);
 
     /**

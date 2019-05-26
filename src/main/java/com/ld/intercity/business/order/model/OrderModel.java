@@ -7,7 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * 订单基础类
@@ -29,15 +29,21 @@ public class OrderModel {
     //创建人称谓
     @ApiModelProperty(value = "创建人称谓", example = "陈先生", required = true)
     private String createName;
+    //上车地点
+    @ApiModelProperty(value = "上车地点", example = "地址主键", required = true)
+    private  String boardingLocation;
+    //下车地点
+    @ApiModelProperty(value = "下车地点", example = "地址主键", required = true)
+    private String DropOffArea;
     //出发地
-    @ApiModelProperty(value = "出发地点", example = "省-市-区/县", required = true)
+    @ApiModelProperty(value = "出发地点", example = "路线主键", required = true)
     private String placeOfDeparture;
     //目的地
-    @ApiModelProperty(value = "目标地点", example = "省-市-区/县", required = true)
+    @ApiModelProperty(value = "目标地点", example = "路线主键", required = true)
     private String destination;
     //出发时间
     @ApiModelProperty(value = "出发时间", example = "dateTime", required = true)
-    private Date departureTime;
+    private LocalDateTime departureTime;
     //乘坐人数
     @ApiModelProperty(value = "乘坐人数", example = "数值", required = true)
     private String presionNumber;
@@ -46,19 +52,19 @@ public class OrderModel {
     private String orderAmount;
     //下单时间
     @ApiModelProperty(value = "下单时间", example = "dateTime", required = true)
-    private Date orderTime;
+    private LocalDateTime orderTime;
     //接单人
     @ApiModelProperty(value = "接单人", example = "dateTime", required = true)
     private String jieDanPresion;
     //接单时间
     @ApiModelProperty(value = "接单时间", example = "dateTime", required = true)
-    private Date jieDanTime;
+    private LocalDateTime jieDanTime;
     //订单状态
     @ApiModelProperty(value = "订单状态", example = "0-已下单未接单 1-未开始已接单  2-已开始未结算  3-已结束未结算 4-已结束已结算  5-已取消", required = true)
     private String orderType;
     //结算时间
     @ApiModelProperty(value = "结算时间", example = "dateTime", required = true)
-    private Date settingTime;
+    private LocalDateTime settingTime;
     //结算人
     @ApiModelProperty(value = "结算人", example = "结算用户主键", required = true)
     private String settingPresion;

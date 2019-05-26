@@ -9,7 +9,7 @@ import java.util.List;
 @Mapper
 public interface OrderMapper {
     @Insert("insert into order_table (" +
-            "#{o.orderSn},#{o.createPresion},#{o.createName},#{o.placeOfDeparture},#{o.destination},#{o.departureTime},#{o.presionNumber},#{o.orderAmount}," +
+            "#{o.orderSn},#{o.createPresion},#{o.createName},#{o.boardingLocation},#{o.DropOffArea},#{o.placeOfDeparture},#{o.destination},#{o.departureTime},#{o.presionNumber},#{o.orderAmount}," +
             "#{o.orderTime},#{o.orderType},#{o.settingTime},#{o.settingPresion}" +
             ")")
     int save(@Param("o") OrderModel orderModel);
@@ -28,7 +28,8 @@ public interface OrderMapper {
      * @return int
      */
     @Update("update order_table set " +
-            "order_sn as orderSn,create_presion as createPresion,create_name as createName,place_of_departure = #{o.placeOfDeparture}" +
+            "order_sn as orderSn,create_presion as createPresion,create_name as createName,boarding_location = #{o.boardingLocation}," +
+            "drop_off_area = #{o.DropOffArea},place_of_departure = #{o.placeOfDeparture}" +
             ",destination = #{o.destination},departure_time = #{o.departureTime}" +
             ",presion_number = #{o.presionNumber},order_amount = #{o.orderAmount},order_time = #{o.orderTime}" +
             ",jie_dan_presion = #{o.jieDanPresion},jie_dan_time = #{o.jieDanTime},order_type = #{o.orderType}" +
@@ -40,7 +41,8 @@ public interface OrderMapper {
      * @return list
      */
     @Select("select " +
-            "order_sn as orderSn,create_presion as createPresion,create_name as createName,place_of_departure as placeOfDeparture," +
+            "order_sn as orderSn,create_presion as createPresion,create_name as createName,boarding_location = #{o.boardingLocation}," +
+            "drop_off_area = #{o.DropOffArea},place_of_departure as placeOfDeparture," +
             "destination as destination,departure_time as departureTime" +
             ",presion_number as presionNumber,order_amount as orderAmount,order_time as orderTime" +
             ",order_type as orderType,setting_time as settingTime,setting_presion as settingPresion " +
@@ -53,7 +55,8 @@ public interface OrderMapper {
      * @return
      */
     @Select("select " +
-            "order_sn as orderSn,create_presion as createPresion,create_name as createName,place_of_departure as placeOfDeparture," +
+            "order_sn as orderSn,create_presion as createPresion,create_name as createName,boarding_location = #{o.boardingLocation}," +
+            "drop_off_area = #{o.DropOffArea},place_of_departure as placeOfDeparture," +
             "destination as destination,departure_time as departureTime" +
             ",presion_number as presionNumber,order_amount as orderAmount,order_time as orderTime" +
             ",order_type as orderType,setting_time as settingTime,setting_presion as settingPresion" +
@@ -66,7 +69,8 @@ public interface OrderMapper {
      * @return OrderModel
      */
     @Select("select " +
-            "order_sn as orderSn,create_presion as createPresion,create_name as createName,place_of_departure as placeOfDeparture," +
+            "order_sn as orderSn,create_presion as createPresion,create_name as createName,boarding_location = #{o.boardingLocation}," +
+            "drop_off_area = #{o.DropOffArea},place_of_departure as placeOfDeparture," +
             "destination as destination,departure_time as departureTime" +
             ",presion_number as presionNumber,order_amount as orderAmount,order_time as orderTime" +
             ",order_type as orderType,setting_time as settingTime,setting_presion as settingPresion" +
@@ -78,7 +82,11 @@ public interface OrderMapper {
      * @param userId 用户的用户ID
      * @return OrderModel
      */
-    @Select("select * from order_table where create_user = #{u}")
+    @Select("select order_sn as orderSn,create_presion as createPresion,create_name as createName,boarding_location = #{o.boardingLocation}," +
+            "drop_off_area = #{o.DropOffArea},place_of_departure as placeOfDeparture," +
+            "destination as destination,departure_time as departureTime" +
+            ",presion_number as presionNumber,order_amount as orderAmount,order_time as orderTime" +
+            ",order_type as orderType,setting_time as settingTime,setting_presion as settingPresion from order_table where create_user = #{u}")
     OrderModel getByKeHuUserId(@Param("u") String userId);
 
     /**
@@ -86,6 +94,10 @@ public interface OrderMapper {
      * @param userId 司机的用户ID
      * @return list
      */
-    @Select("select * from order_table where jie_dan_presion = #{u}")
+    @Select("select order_sn as orderSn,create_presion as createPresion,create_name as createName,boarding_location = #{o.boardingLocation}," +
+            "drop_off_area = #{o.DropOffArea},place_of_departure as placeOfDeparture," +
+            "destination as destination,departure_time as departureTime" +
+            ",presion_number as presionNumber,order_amount as orderAmount,order_time as orderTime" +
+            ",order_type as orderType,setting_time as settingTime,setting_presion as settingPresion from order_table where jie_dan_presion = #{u}")
     List<OrderModel> getBySiJiUserId(@Param("u") String userId);
 }

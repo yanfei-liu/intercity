@@ -29,7 +29,7 @@ public class AddressModel {
     private LocalDateTime createTime;
     //地址-省
     private String province;
-    //事
+    //市
     private String city;
     //区/县
     private String county;
