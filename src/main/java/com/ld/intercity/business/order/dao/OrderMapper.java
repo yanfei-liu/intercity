@@ -72,4 +72,20 @@ public interface OrderMapper {
             ",order_type as orderType,setting_time as settingTime,setting_presion as settingPresion" +
             " from order_table where order_sn = #{orderSn}")
     OrderModel getOneByOrderSn(@Param("orderSn") String orderSn);
+
+    /**
+     * 根据乘客的用户Id查看未结算的订单
+     * @param userId 用户的用户ID
+     * @return OrderModel
+     */
+    @Select("select * from order_table where create_user = #{u}")
+    OrderModel getByKeHuUserId(@Param("u") String userId);
+
+    /**
+     * 查看司机接单后未完成的订单
+     * @param userId 司机的用户ID
+     * @return list
+     */
+    @Select("select * from order_table where jie_dan_presion = #{u}")
+    List<OrderModel> getBySiJiUserId(@Param("u") String userId);
 }

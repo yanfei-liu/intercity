@@ -4,6 +4,7 @@ import com.github.pagehelper.PageInfo;
 import com.google.gson.Gson;
 import com.ld.intercity.business.order.model.OrderModel;
 import com.ld.intercity.business.order.service.OrderService;
+import com.ld.intercity.business.user.model.UserModel;
 import com.ld.intercity.utils.yaml.YamlPageUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -149,7 +150,8 @@ public class OrderController {
     @ResponseBody
     public String findAllByType(@ApiParam(value = "当前页数", required = true)
                                               @PathVariable("pageNow") int pageNow,
-                              @RequestParam("type") String type){
+                              @ApiParam(value = "0-已下单未接单 1-未开始已接单  2-已开始未结算  3-已结束未结算 4-已结束已结算  5-已取消",required = true)
+                              @PathVariable("type") String type){
         PageInfo<OrderModel> allByType = service.findAllByType(pageNow, YamlPageUtils.getPageSize(), type);
         Gson gson = new Gson();
         String s = gson.toJson(allByType);
@@ -168,6 +170,32 @@ public class OrderController {
         OrderModel oneByOrderSn = service.getOneByOrderSn(orderSn);
         Gson gson = new Gson();
         String s = gson.toJson(oneByOrderSn);
+        return s;
+    }
+
+    /**
+     * 根据用户ID查询客户未结算订单或者司机接单未完成订单
+     * @param request request
+     * @return String
+     */
+    @ApiOperation(value = "根据用户ID查询客户未结算订单或者司机接单未完成订单")
+    @RequestMapping(value = "/getByUserId",method = RequestMethod.GET)
+    @ResponseBody
+    public String getByUserId(HttpServletRequest request){
+        UserModel user = (UserModel) request.getSession().getAttribute("user");
+        //客户，查看其生成的当前未结算订单
+        String identity = user.getIdentity();
+        String s = "";
+        Gson gson = new Gson();
+        if ("1".equals(identity)){
+            OrderModel byKeHuUserId = service.getByKeHuUserId(identity);
+            s = gson.toJson(byKeHuUserId);
+        }
+        //司机，查看其接单的未结算订单
+        if ("2".equals(identity)){
+            List<OrderModel> bySiJiUserId = service.getBySiJiUserId(identity);
+            s = gson.toJson(bySiJiUserId);
+        }
         return s;
     }
 }

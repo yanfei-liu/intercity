@@ -55,5 +55,17 @@ public interface OrderService {
      */
     OrderModel getOneByOrderSn(String orderSn);
 
+    /**
+     * 根据乘客的用户Id查看未结算的订单
+     * @param userId 用户的用户ID
+     * @return OrderModel
+     */
+    OrderModel getByKeHuUserId(String userId);
 
+    /**
+     * 查看司机接单后未完成的订单
+     * @param userId 司机的用户ID
+     * @return list
+     */
+    List<OrderModel> getBySiJiUserId(String userId);
 }

@@ -74,4 +74,14 @@ public class OrderServiceImpl implements OrderService {
     public OrderModel getOneByOrderSn(String orderSn) {
         return orderMapper.getOneByOrderSn(orderSn);
     }
+
+    @Override
+    public OrderModel getByKeHuUserId(String userId) {
+        return orderMapper.getByKeHuUserId(userId);
+    }
+
+    @Override
+    public List<OrderModel> getBySiJiUserId(String userId) {
+        return orderMapper.getBySiJiUserId(userId);
+    }
 }

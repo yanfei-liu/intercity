@@ -18,18 +18,24 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RouteModel {
+    //主键
+    private String uuid;
     //路线地址：省1
     private String provinceOne;
     //路线地址：市1
     private String cityOne;
     //路线地址：区/县1
     private String countyOne;
+    //线路地址：区域1
+    private String regionOne;
     //路线地址：省2
     private String provinceTwo;
     //路线地址：市2
     private String cityTwo;
     //路线地址：区/县2
     private String countyTwo;
+    //线路地址：区域2
+    private String regionTwo;
     //路线距离
     private String distance;
     //距离单位
