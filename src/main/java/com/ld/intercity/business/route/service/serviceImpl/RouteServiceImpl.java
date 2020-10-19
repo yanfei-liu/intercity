@@ -31,9 +31,10 @@ public class RouteServiceImpl implements RouteService {
     }
 
     @Override
-    public RouteModel getByRegionOneAndRegionTwo(String regionOne, String regionTwo) {
-        return mapper.getByRegionOneAndRegionTwo(regionOne,regionTwo);
+    public RouteModel getByRegionOneAndRegionTwo(String provinceOne, String cityOne, String countyOne, String provinceTwo, String cityTwo, String countyTwo) {
+        return mapper.getByRegionOneAndRegionTwo(provinceOne, cityOne, countyOne, provinceTwo, cityTwo, countyTwo);
     }
+
 
     @Override
     public List<RouteModel> findAll() {

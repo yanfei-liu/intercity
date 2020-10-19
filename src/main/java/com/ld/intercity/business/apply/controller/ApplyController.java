@@ -90,9 +90,11 @@ public class ApplyController {
     @RequestMapping(value = "applyAdopt",method = RequestMethod.GET)
     @ResponseBody
     public String applyAdopt(@PathVariable String passengerId){
-        List<ApplyModel> byPassengerId = applyService.findByPassengerId(passengerId, "0");
+        List<ApplyModel> byPassengerId = applyService.findByPassengerId(passengerId);
         for (ApplyModel app:byPassengerId){
-            applyService.update(app);
+            if ("0".equals(app.getProgress())){
+                applyService.update(app);
+            }
         }
         HashMap<String, String> map = new HashMap<>();
         map.put("success","true");
@@ -128,8 +130,8 @@ public class ApplyController {
     @ApiOperation("查询某用户提交的申请")
     @RequestMapping(value = "findByPassengerId",method = RequestMethod.POST)
     @ResponseBody
-    public String findByPassengerId(@RequestParam("passengerId") String passengerId,@RequestParam("type")String type){
-        List<ApplyModel> byPassengerId = applyService.findByPassengerId(passengerId, type);
+    public String findByPassengerId(@RequestParam("passengerId") String passengerId){
+        List<ApplyModel> byPassengerId = applyService.findByPassengerId(passengerId);
         String s = toJson(byPassengerId);
         return s;
     }

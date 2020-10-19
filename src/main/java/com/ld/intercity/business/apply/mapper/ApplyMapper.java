@@ -7,16 +7,29 @@ import java.util.List;
 
 @Mapper
 public interface ApplyMapper {
-    @Insert("insert into apply_table values (#{a.uuid},#{a.passengerId},#{a.applyType},@{a.applicationMaterials},#{a.createTime},#{a.progress})")
+    @Insert("insert into apply_table values (" +
+            "#{a.uuid},#{a.passengerId},#{a.idCardId},#{a.driverName},#{a.driverPhone},#{a.idCarFacePhoto},#{a.idCarBackPhoto}" +
+            ",#{a.holdIdCarFacePhoto},#{a.driverLicenseOriginal},#{a.driverLicenseCopy},#{a.vehicleModel},#{a.drivingLicenseOriginal}" +
+            "，#{a.drivingLicenseCopy},#{a.vehicleRearPhoto},#{a.carFortyFivePhoto},#{a.createTime},#{a.progress})")
     int save(@Param("a") ApplyModel applyModel);
     @Delete("delete from apply_table where uuid = #{uuid}")
     int del(@Param("uuid") String uuid);
     @Delete("delete from apply_table where passenger_id = #{p}")
     int delByPassengerId(@Param("p") String passengerId);
-    @Update("update apply_table set passenger_id = #{a.passengerId},apply_type=#{a.applyType},application_materials=@{a.applicationMaterials},create_time = #{a.createTime},progress = #{a.progress} where uuid = #{a.uuid}")
+    @Update("update apply_table set progress = #{a.progress} where uuid = #{a.uuid}")
     int update(@Param("a") ApplyModel applyModel);
-    @Select("select uuid as uuid,passenger_id as passengerId,apply_type as applyType,application_materials as applicationMaterials,create_time as createTime,progress as progress from apply_table where passenger_id = #{p} and type = #{t}")
-    List<ApplyModel> findByPassengerId(@Param("p") String passengerId,@Param("t") String type);
-    @Select("select uuid as uuid,passenger_id as passengerId,apply_type as applyType,application_materials as applicationMaterials,create_time as createTime,progress as progress from apply_table where type = #{t}")
+    @Select("select uuid as uuid,passenger_id as passengerId,id_card_id as idCardId,driver_name as driverName," +
+            "driver_phone as driverPhone,id_car_face_photo as idCarFacePhoto,id_car_back_photo as idCarBackPhoto," +
+            "hold_id_car_face_photo as holdIdCarFacePhoto,driver_license_original as driverLicenseOriginal," +
+            "vehicle_model as vehicleModel,driving_license_original as drivingLicenseOriginal,driver_license_copy as driverLicenseCopy," +
+            "vehicle_rear_photo as vehicleRearPhoto,car_forty_five_photo as carFortyFivePhoto,create_time as createTime,progress as progress " +
+            "from apply_table where passenger_id = #{p}")
+    List<ApplyModel> findByPassengerId(@Param("p") String passengerId);
+    @Select("select uuid as uuid,passenger_id as passengerId,id_card_id as idCardId,driver_name as driverName," +
+            "driver_phone as driverPhone,id_car_face_photo as idCarFacePhoto,id_car_back_photo as idCarBackPhoto," +
+            "hold_id_car_face_photo as holdIdCarFacePhoto,driver_license_original as driverLicenseOriginal," +
+            "vehicle_model as vehicleModel,driving_license_original as drivingLicenseOriginal,driver_license_copy as driverLicenseCopy," +
+            "vehicle_rear_photo as vehicleRearPhoto,car_forty_five_photo as carFortyFivePhoto,create_time as createTime,progress as progress " +
+            "from apply_table where progress = #{t}")
     List<ApplyModel> findAllByType(@Param("t") String type);
 }

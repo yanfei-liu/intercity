@@ -20,14 +20,21 @@ public interface RouteMapper {
 
     /**
      * 根据起始地点和目标地点查询路线
-     * @param regionOne 起始地点
-     * @param regionTwo 目标地点
-     * @return
+     * @param provinceOne 起始地省
+     * @param cityOne 目标地市
+     * @param countyOne 目标地区县
+     * @param provinceTwo 目标地省
+     * @param cityTwo 目标地市
+     * @param countyTwo 目标地区县
+     * @return  RouteModel
      */
     @Select("select uuid as uuid,province_one as provinceOne,city_one as cityOne,county_one as countyOne,region_one as regionOne," +
             "province_two as provinceTwo,city_two as cityTwo,county_two as countyTwo,region_two as regionTwo,distance as distance," +
-            "company as company,price as price,money as money from route_table where region_one = #{o} and region_two = #{t} or region_one = #{t} and region_two = #{o}")
-    RouteModel getByRegionOneAndRegionTwo(@Param("o") String regionOne,@Param("t") String regionTwo);
+            "company as company,price as price,money as money from route_table where province_one = #{provincOne} and city_one = " +
+            "#{cityOne} and county_one = #{countyOne} and province_two = #{provinceTwo} and city_two = #{cityTwo} and county_two = #{countyTwo}")
+    RouteModel getByRegionOneAndRegionTwo(
+            @Param("provinceOne") String provinceOne,@Param("cityOne") String cityOne,@Param("countyOne") String countyOne,
+            @Param("provinceTwo") String provinceTwo,@Param("cityTwo") String cityTwo,@Param("countyTwo") String countyTwo);
 
     /**
      * 查询所有delFlag删除标记为0的记录

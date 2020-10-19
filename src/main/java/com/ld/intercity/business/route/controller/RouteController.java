@@ -49,8 +49,10 @@ public class RouteController {
     @ApiOperation(value = "根据起始和终点目标查询路线信息")
     @RequestMapping(value = "/getByRegionOneAndRegionTwo",method = RequestMethod.GET)
     @ResponseBody
-    public String getByRegionOneAndRegionTwo(@PathVariable("one") String regionOne,@PathVariable("two") String regionTwo){
-        RouteModel byRegionOneAndRegionTwo = service.getByRegionOneAndRegionTwo(regionOne, regionTwo);
+    public String getByRegionOneAndRegionTwo(
+            @PathVariable("provinceOne") String provinceOne,@PathVariable("cityOne") String cityOne,@PathVariable("countyOne")String countyOne,
+            @PathVariable("provinceTwo") String provinceTwo,@PathVariable("cityTwo") String cityTwo,@PathVariable("countyTwo") String countyTwo){
+        RouteModel byRegionOneAndRegionTwo = service.getByRegionOneAndRegionTwo(provinceOne, cityOne, countyOne, provinceTwo, cityTwo, countyTwo);
         String s = toJson(byRegionOneAndRegionTwo);
         return s;
     }

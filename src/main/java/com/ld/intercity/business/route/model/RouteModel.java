@@ -1,7 +1,9 @@
 package com.ld.intercity.business.route.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,30 +20,32 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RouteModel {
-    //主键
+    @ApiModelProperty(value = "主键",example = "uuid",required = true)
     private String uuid;
-    //路线地址：省1
+    @ApiModelProperty(value = "出发省",example = "113000",required = true)
     private String provinceOne;
-    //路线地址：市1
+    @ApiModelProperty(value = "出发市",example = "1130001",required = true)
     private String cityOne;
-    //路线地址：区/县1
+    @ApiModelProperty(value = "出发区县",example = "113000101",required = true)
     private String countyOne;
-    //线路地址：区域1
+    @ApiModelProperty(value = "出发区域")
     private String regionOne;
-    //路线地址：省2
+    @ApiModelProperty(value = "目的地省",example = "113000",required = true)
     private String provinceTwo;
-    //路线地址：市2
+    @ApiModelProperty(value = "目的地市",example = "1130001",required = true)
     private String cityTwo;
-    //路线地址：区/县2
-    private String countyTwo;
-    //线路地址：区域2
+    @ApiModelProperty(value = "目的地区县",example = "113000101",required = true)
+        private String countyTwo;
+    @ApiModelProperty(value = "目的地区域")
     private String regionTwo;
-    //路线距离
+    @ApiModelProperty(value = "路线距离",example = "123",required = true)
     private String distance;
-    //距离单位
+    @ApiModelProperty(value =  "距离单位")
     private String company;
-    //单位距离单价
-    private BigDecimal price;
-    //总价格
-    private BigDecimal money;
+    @ApiModelProperty(value = "一个人的价格")
+    private BigDecimal oneUserPrice;
+    @ApiModelProperty(value = "五座车包车价")
+    private BigDecimal fiveSeatsPrice;
+    @ApiModelProperty(value = "七座车包车价")
+    private BigDecimal sevenSeatsPrice;
 }

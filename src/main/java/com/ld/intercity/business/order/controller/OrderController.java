@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Api(value = "订单接口", tags = "订单相关操作接口")
 @Slf4j
@@ -31,42 +32,44 @@ public class OrderController {
     @ResponseBody
     public String save(@RequestBody OrderModel orderModel
             ,HttpServletRequest request){
-        HashMap<String, String> map = new HashMap<>();
-        int save = service.save(orderModel, request);
-        if (save==1){
-            map.put("success","true");
-        }else {
-            map.put("success","false");
-        }
+        Map save = service.save(orderModel, request);
         Gson gson = new Gson();
-        return gson.toJson(map);
+        return gson.toJson(save);
     }
 
 
     /**
      * 删除订单
      * @param orderSn  订单编号
-     * @return int
+     * @return json
      */
     @ApiOperation(value = "删除订单")
     @RequestMapping(value = "/del",method = RequestMethod.GET)
     @ResponseBody
     public String del(@RequestParam String orderSn){
-        HashMap<String, String> map = new HashMap<>();
-        int del = service.del(orderSn);
-        if (del==1){
-            map.put("success","true");
-        }else {
-            map.put("success","false");
-        }
+        Map del = service.del(orderSn);
         Gson gson = new Gson();
-        return gson.toJson(map);
+        return gson.toJson(del);
+    }
+
+    /**
+     * 司机去接单大厅检索订单
+     * @param orderModel    检索条件
+     * @return  json
+     */
+    @ApiOperation(value = "司机去接单大厅检索订单")
+    @RequestMapping(value = "/findByDriverFindOrder",method = RequestMethod.POST)
+    @ResponseBody
+    public String findByDriverFindOrder(@RequestBody OrderModel orderModel){
+        List<OrderModel> byDriverFindOrder = service.findByDriverFindOrder(orderModel);
+        Gson gson = new Gson();
+        return gson.toJson(byDriverFindOrder);
     }
 
     /**
      * 接单
      * @param orderSn 订单编号
-     * @return int
+     * @return json
      */
     @ApiOperation(value = "接单")
     @RequestMapping(value = "/updateJieDan",method = RequestMethod.GET)
@@ -87,7 +90,7 @@ public class OrderController {
     /**
      * 完成订单
      * @param orderSn 订单编号
-     * @return int
+     * @return json
      */
     @ApiOperation(value = "完成订单")
     @RequestMapping(value = "/updateWanCheng",method = RequestMethod.GET)
@@ -98,9 +101,11 @@ public class OrderController {
         oneByOrderSn.setOrderType("3");
         int update = service.update(oneByOrderSn);
         if (update==1){
-            map.put("success","true");
+            map.put("code","0");
+            map.put("msg","订单已完成");
         }else {
-            map.put("success","false");
+            map.put("code","1001");
+            map.put("msg","订单修改失败");
         }
         Gson gson = new Gson();
         return gson.toJson(map);
@@ -109,26 +114,35 @@ public class OrderController {
     /**
      * 修改订单
      * @param orderModel 订单实体类
-     * @return int
+     * @return json
      */
     @ApiOperation(value = "修改订单")
     @RequestMapping(value = "/update",method = RequestMethod.POST)
     @ResponseBody
     public String update(@RequestBody OrderModel orderModel){
         HashMap<String, String> map = new HashMap<>();
-        int update = service.update(orderModel);
-        if (update==1){
-            map.put("success","true");
+        OrderModel oneByOrderSn = service.getOneByOrderSn(orderModel.getOrderSn());
+        if ("0".equals(oneByOrderSn.getOrderType())){
+            int update = service.update(orderModel);
+            if (update==1){
+                map.put("code","0");
+                map.put("msg","修改成功");
+            }else {
+                map.put("code","1001");
+                map.put("msg","修改失败，请稍后再试");
+            }
         }else {
-            map.put("success","false");
+            map.put("code","1002");
+            map.put("msg","该订单已被接单不得进行修改");
         }
+
         Gson gson = new Gson();
         return gson.toJson(map);
     }
 
     /**
      * 查询全部订单
-     * @return list
+     * @return json
      */
     @ApiOperation(value = "查询全部订单")
     @RequestMapping(value = "/findAll",method = RequestMethod.GET)
@@ -143,7 +157,7 @@ public class OrderController {
     /**
      * 根据传入状态查询各状态的全部订单
      * @param type 类型：0-已下单未接单 1-未开始已接单  2-已开始未结算  3-已结束未结算 4-已结束已结算  5-已取消
-     * @return
+     * @return  json
      */
     @ApiOperation(value = "根据传入状态查询各状态的全部订单")
     @RequestMapping(value = "/findAllByType",method = RequestMethod.GET)
@@ -161,7 +175,7 @@ public class OrderController {
     /**
      * 根据订单号查询单个订单
      * @param orderSn 订单号
-     * @return OrderModel
+     * @return json
      */
     @ApiOperation(value = "根据订单号查询单个订单")
     @RequestMapping(value = "/getOneByOrderSn",method = RequestMethod.GET)
@@ -176,7 +190,7 @@ public class OrderController {
     /**
      * 根据用户ID查询客户未结算订单或者司机接单未完成订单
      * @param request request
-     * @return String
+     * @return json
      */
     @ApiOperation(value = "根据用户ID查询客户未结算订单或者司机接单未完成订单")
     @RequestMapping(value = "/getByUserId",method = RequestMethod.GET)

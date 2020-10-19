@@ -9,6 +9,6 @@ public interface ApplyService {
     int del(String uuid);
     int delByPassengerId(String passengerId);
     int update(ApplyModel applyModel);
-    List<ApplyModel> findByPassengerId(String passengerId,String type);
+    List<ApplyModel> findByPassengerId(String passengerId);
     List<ApplyModel> findAllByType(String type);
 }

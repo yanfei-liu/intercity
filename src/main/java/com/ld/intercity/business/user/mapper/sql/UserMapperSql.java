@@ -1,6 +1,7 @@
 package com.ld.intercity.business.user.mapper.sql;
 
 import com.ld.intercity.business.user.model.UserModel;
+import org.apache.commons.lang.StringUtils;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.jdbc.SQL;
 
@@ -15,7 +16,7 @@ public class UserMapperSql {
         return new SQL() {
             {
                 UPDATE("user_table");
-                if (!model.getIdentity().isBlank()) {
+                if (StringUtils.isNotBlank(model.getIdentity())) {
                     SET("identity=#{model.identity}");
                 }
                 WHERE("uuid = #{model.uuid}");
@@ -28,7 +29,7 @@ public class UserMapperSql {
             {
                 SELECT("*");
                 FROM("user_table");
-                if (!model.getIdentity().isBlank()) {
+                if (StringUtils.isNotBlank(model.getIdentity())) {
                     WHERE("identity=#{model.identity}");
                 }
             }

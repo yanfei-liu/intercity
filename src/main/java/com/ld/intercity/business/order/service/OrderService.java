@@ -2,24 +2,27 @@ package com.ld.intercity.business.order.service;
 
 import com.github.pagehelper.PageInfo;
 import com.ld.intercity.business.order.model.OrderModel;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public interface OrderService {
     /**
      * 生成订单
      * @param orderModel 订单实体类
-     * @return int
+     * @return map
      */
-    int save(OrderModel orderModel,HttpServletRequest request);
+    Map save(OrderModel orderModel, HttpServletRequest request);
 
     /**
      * 删除订单
      * @param orderSn  订单编号
-     * @return int
+     * @return map
      */
-    int del(String orderSn);
+    Map del(String orderSn);
 
     /**
      * 修改订单
@@ -27,6 +30,14 @@ public interface OrderService {
      * @return int
      */
     int update(OrderModel orderModel);
+
+    /**
+     * 司机去接单大厅检索订单
+     * 根据司机输入的出发城市/目的地城市以及时间（未指定默认当前时间）等条件检索已下单未结单的订单
+     * @param orderModel    检索条件
+     * @return  map
+     */
+    List<OrderModel> findByDriverFindOrder(OrderModel orderModel);
 
     /**
      * 接单

@@ -23,50 +23,56 @@ public class OrderModel {
     private String uuid;
     @ApiModelProperty(value = "订单编号", example = "由后台自动生成,生成时间的long类型数值", required = true)
     private String orderSn;
-    //创建人
     @ApiModelProperty(value = "创建人", example = "创建人Uuid", required = true)
     private String createPresion;
-    //创建人称谓
     @ApiModelProperty(value = "创建人称谓", example = "陈先生", required = true)
     private String createName;
-    //上车地点
-    @ApiModelProperty(value = "上车地点", example = "地址主键", required = true)
-    private  String boardingLocation;
-    //下车地点
-    @ApiModelProperty(value = "下车地点", example = "地址主键", required = true)
-    private String DropOffArea;
-    //出发地
-    @ApiModelProperty(value = "出发地点", example = "路线主键", required = true)
-    private String placeOfDeparture;
-    //目的地
-    @ApiModelProperty(value = "目标地点", example = "路线主键", required = true)
-    private String destination;
-    //出发时间
+    @ApiModelProperty(value = "创建人电话")
+    private String phone;
+    @ApiModelProperty(value = "上车地点坐标", example = "坐标", required = true)
+    private  String startCoordinate;
+    @ApiModelProperty(value = "下车地点坐标", example = "坐标", required = true)
+    private String endCoordinate;
+    @ApiModelProperty(value = "出发省",required = true)
+    private String startProvince;
+    @ApiModelProperty(value = "出发市",required = true)
+    private String startCity;
+    @ApiModelProperty(value = "出发区县",required = true)
+    private String startCounty;
+    @ApiModelProperty(value = "目的省",required = true)
+    private String endProvince;
+    @ApiModelProperty(value = "目的市",required = true)
+    private String endCity;
+    @ApiModelProperty(value = "目的区县",required = true)
+    private String endCounty;
+    @ApiModelProperty(value = "路线表id",required = true)
+    private String routeId;
     @ApiModelProperty(value = "出发时间", example = "dateTime", required = true)
     private LocalDateTime departureTime;
-    //乘坐人数
     @ApiModelProperty(value = "乘坐人数", example = "数值", required = true)
     private String presionNumber;
-    //订单金额
+    @ApiModelProperty(value = "是否包车",example = "0:不包车，1:包车")
+    private String isCharterCar;
+    @ApiModelProperty(value = "包车车型",example = "1:五座，2:七座")
+    private String charterCarType;
     @ApiModelProperty(value = "订单金额", example = "数值", required = true)
     private String orderAmount;
-    //下单时间
     @ApiModelProperty(value = "下单时间", example = "dateTime", required = true)
     private LocalDateTime orderTime;
-    //接单人
     @ApiModelProperty(value = "接单人", example = "dateTime", required = true)
     private String jieDanPresion;
-    //接单时间
     @ApiModelProperty(value = "接单时间", example = "dateTime", required = true)
     private LocalDateTime jieDanTime;
-    //订单状态
-    @ApiModelProperty(value = "订单状态", example = "0-已下单未接单 1-未开始已接单  2-已开始未结算  3-已结束未结算 4-已结束已结算  5-已取消", required = true)
+    @ApiModelProperty(value = "订单状态", example = "0-已下单未接单 1-已接单未开始  2-已开始未结算  3-已结束未结算 4-已结束已结算  5-已取消", required = true)
     private String orderType;
-    //结算时间
+    @ApiModelProperty(value = "下车地点坐标",example = "坐标")
+    private String outCarCoordinate;
+    @ApiModelProperty(value = "下车时间",example = "2020-9-26 20:08:10")
+    private LocalDateTime outCarTime;
     @ApiModelProperty(value = "结算时间", example = "dateTime", required = true)
     private LocalDateTime settingTime;
-    //结算人
     @ApiModelProperty(value = "结算人", example = "结算用户主键", required = true)
     private String settingPresion;
-
+    @ApiModelProperty(value = "是否删除",example = "0正常，1已删除",required = true)
+    private String delFlag;
 }

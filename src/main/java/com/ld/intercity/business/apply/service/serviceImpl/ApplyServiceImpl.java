@@ -34,8 +34,8 @@ public class ApplyServiceImpl implements ApplyService {
     }
 
     @Override
-    public List<ApplyModel> findByPassengerId(String passengerId,String type) {
-        return applyMapper.findByPassengerId(passengerId, type);
+    public List<ApplyModel> findByPassengerId(String passengerId) {
+        return applyMapper.findByPassengerId(passengerId);
     }
 
     @Override
