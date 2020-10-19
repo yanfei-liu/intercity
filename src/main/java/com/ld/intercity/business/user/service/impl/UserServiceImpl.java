@@ -61,4 +61,9 @@ public class UserServiceImpl implements UserService {
             return new ResponseResult<>(false, "未查询到记录");
         }
     }
+
+    @Override
+    public UserModel getByWeChatId(String weChatId) throws Exception{
+        return mapper.getByWeChatId(weChatId);
+    }
 }

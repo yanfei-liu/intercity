@@ -38,4 +38,7 @@ public interface UserMapper {
 
     @SelectProvider(type = UserMapperSql.class, method = "findAll")
     Page<UserModel> findAll(@Param("model") UserModel model) throws SQLException;
+
+    @Select("select * from " + TABLE_NAME + " where we_chat_id = #{weChatId}")
+    UserModel getByWeChatId(String weChatId)throws SQLException;
 }

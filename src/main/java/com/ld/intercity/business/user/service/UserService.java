@@ -49,4 +49,11 @@ public interface UserService {
      * @Param [pageNow, pageSize, model]
      **/
     ResponseResult<PageInfo<UserModel>> findAll(int pageNow, int pageSize, UserModel model) throws Exception;
+
+    /**
+     * 根据微信标识查询用户
+     * @param weChatId  微信标识openId
+     * @return  UserModel
+     */
+    UserModel getByWeChatId(String weChatId)throws Exception;
 }

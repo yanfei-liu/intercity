@@ -2,17 +2,22 @@ package com.ld.intercity.business.login.controller;
 
 import com.ld.intercity.business.login.entity.Login;
 import com.ld.intercity.business.login.service.LoginService;
+import com.ld.intercity.business.user.model.UserModel;
+import com.ld.intercity.business.user.service.UserService;
 import com.ld.intercity.sys.shiro.JWTUtils;
 import com.ld.intercity.utils.ResponseResult;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.DigestUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -31,10 +36,13 @@ import java.util.UUID;
 public class LoginController {
     @Autowired
     private LoginService loginService;
+    @Autowired
+    private UserService userService;
+
     @ApiOperation(value = "微信登陆")
     @RequestMapping(value = "Init",method = RequestMethod.POST)
     @ResponseBody
-    public HashMap<String, String> Init(@RequestParam("code") String code) {
+    public HashMap<String, String> Init(@RequestParam("code") String code, HttpServletRequest request, HttpServletResponse response) {
         String str = "";
         HashMap<String, String> map = new HashMap<>();
         HashMap<String, String> map1 = new HashMap<>();
@@ -62,13 +70,25 @@ public class LoginController {
                     openId.setOpenId(map.get("openid"));
                     openId.setSessionKey(map.get("session_key"));
                     loginService.save(openId);
+                    UserModel userModel = new UserModel();
+                    userModel.setUuid(UUID.randomUUID().toString());
+                    userModel.setIdentity("1");
+                    userService.save(userModel);
+                    request.getSession().setAttribute("user",userModel);
+                    map1.put("identity",openId.getOpenId());
+                    map1.put("code","1001");
+                    map1.put("message","缺少电话号码");
+                }else {
+                    UserModel byWeChatId = userService.getByWeChatId(openId.getOpenId());
+                    request.getSession().setAttribute("user",byWeChatId);
+                    map1.put("identity",byWeChatId.getIdentity());
+                    map1.put("code","0");
+                    map1.put("message","成功");
                 }
                 String token = JWTUtils.creaToken(openId.getOpenId(), openId.getUuid(), openId.getSessionKey());
-                map1.put("code","0");
-                map1.put("message","成功");
                 map1.put("data",token);
             }else {
-                map1.put("code","1001");
+                map1.put("code","1002");
                 map1.put("message","失败");
             }
         } catch (Exception e) {
