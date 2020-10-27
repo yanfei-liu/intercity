@@ -50,12 +50,13 @@ public class FileController {
         }
         FileOutputStream out = null;
         try {
-            String name = multipartFile.getName();
-            boolean contains = name.contains("\\.");
+            String name = multipartFile.getOriginalFilename();
+//            boolean contains = name.contains("\\.");
+            boolean contains = name != null && name.contains(".");
             if (!contains) {
                 return new ResponseResult2(0, "非法文件名称");
             }
-            int i = name.lastIndexOf("\\.");
+            int i = name.lastIndexOf(".");
             String substring = name.substring(i - 1);
             String fileName = uuid + substring;
             out = new FileOutputStream(filePath + fileName);
