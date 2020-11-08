@@ -9,13 +9,13 @@ import java.util.List;
 public interface RouteMapper {
     @Insert("insert into route_table values (uuid = #{r.uuid},province_one = #{r.provinceOne},city_one = #{r.cityOne},county_one = #{r.countyOne},region_one = #{r.regionOne}," +
             "province_two = #{r.provinceTwo},city_two = #{r.cityTwo},county_two = #{r.countyTwo},region_two = #{r.regionTwo},distance = #{r.distance}," +
-            "company = #{r.company},price = #{r.price},money = #{r.money})")
+            "company = #{r.company},one_user_price = #{r.oneUserPrice},five_seats_price = #{r.fiveSeatsPrice},seven_seats_price = #{r.sevenSeatsPrice})")
     int save (@Param("r") RouteModel routeModel);
     @Update("update from route_table set del_flag = 1 where uuid = #{u}")
     int del(@Param("u") String uuid);
     @Update("update from route_table set province_one = #{r.provinceOne},city_one = #{r.cityOne},county_one = #{r.countyOne},region_one = #{r.regionOne}," +
             "province_two = #{r.provinceTwo},city_two = #{r.cityTwo},county_two = #{r.countyTwo},region_two = #{r.regionTwo},distance = #{r.distance}," +
-            "company = #{r.company},price = #{r.price},money = #{r.money} where uuid = #{r.uuid}")
+            "company = #{r.company},one_user_price = #{r.oneUserPrice},five_seats_price = #{r.fiveSeatsPrice},seven_seats_price = #{r.sevenSeatsPrice} where uuid = #{r.uuid}")
     int update(@Param("r") RouteModel routeModel);
 
     /**
@@ -30,8 +30,9 @@ public interface RouteMapper {
      */
     @Select("select uuid as uuid,province_one as provinceOne,city_one as cityOne,county_one as countyOne,region_one as regionOne," +
             "province_two as provinceTwo,city_two as cityTwo,county_two as countyTwo,region_two as regionTwo,distance as distance," +
-            "company as company,price as price,money as money from route_table where province_one = #{provincOne} and city_one = " +
-            "#{cityOne} and county_one = #{countyOne} and province_two = #{provinceTwo} and city_two = #{cityTwo} and county_two = #{countyTwo}")
+            "company as company,one_user_price as oneUserPrice,five_seats_price as fiveSeatsPrice,seven_seats_price as sevenSeatsPrice" +
+            " from route_table where province_one = #{provincOne} and city_one = #{cityOne} and county_one = #{countyOne} and " +
+            "province_two = #{provinceTwo} and city_two = #{cityTwo} and county_two = #{countyTwo} and del_flag = 0")
     RouteModel getByRegionOneAndRegionTwo(
             @Param("provinceOne") String provinceOne,@Param("cityOne") String cityOne,@Param("countyOne") String countyOne,
             @Param("provinceTwo") String provinceTwo,@Param("cityTwo") String cityTwo,@Param("countyTwo") String countyTwo);
@@ -42,6 +43,18 @@ public interface RouteMapper {
      */
     @Select("select uuid as uuid,province_one as provinceOne,city_one as cityOne,county_one as countyOne,region_one as regionOne," +
             "province_two as provinceTwo,city_two as cityTwo,county_two as countyTwo,region_two as regionTwo,distance as distance," +
-            "company as company,price as price,money as money from route_table where del_flag = 0")
+            "company as company,one_user_price as oneUserPrice,five_seats_price as fiveSeatsPrice,seven_seats_price as sevenSeatsPrice" +
+            " from route_table where del_flag = 0")
     List<RouteModel> findAll();
+
+    /**
+     * 根据线路ID查询线路
+     * @param uuid
+     * @return
+     */
+    @Select("select uuid as uuid,province_one as provinceOne,city_one as cityOne,county_one as countyOne,region_one as regionOne," +
+            "province_two as provinceTwo,city_two as cityTwo,county_two as countyTwo,region_two as regionTwo,distance as distance," +
+            "company as company,one_user_price as oneUserPrice,five_seats_price as fiveSeatsPrice,seven_seats_price as sevenSeatsPrice" +
+            " from route_table where uuid = #{uuid} and del_flag = 0")
+    RouteModel getById(@Param("uuid") String uuid);
 }

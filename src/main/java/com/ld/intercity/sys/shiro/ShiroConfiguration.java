@@ -90,6 +90,10 @@ public class ShiroConfiguration {
         filterChainDefinitionMap.put("/login/**", "anon");
         filterChainDefinitionMap.put("/favicon.ico", "anon");
         filterChainDefinitionMap.put("/swagger2-ui.html", "anon");
+        filterChainDefinitionMap.put("/swagger-ui.html", "anon");
+        filterChainDefinitionMap.put("/swagger-resources/**", "anon");
+        filterChainDefinitionMap.put("/v2/**", "anon");
+        filterChainDefinitionMap.put("/webjars/**", "anon");
 //        filterChainDefinitionMap.put("/**", "statelessAuthcFilter");
         shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);
         return shiroFilterFactoryBean;

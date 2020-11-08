@@ -10,7 +10,7 @@ public interface ApplyMapper {
     @Insert("insert into apply_table values (" +
             "#{a.uuid},#{a.passengerId},#{a.idCardId},#{a.driverName},#{a.driverPhone},#{a.idCarFacePhoto},#{a.idCarBackPhoto}" +
             ",#{a.holdIdCarFacePhoto},#{a.driverLicenseOriginal},#{a.driverLicenseCopy},#{a.vehicleModel},#{a.drivingLicenseOriginal}" +
-            "，#{a.drivingLicenseCopy},#{a.vehicleRearPhoto},#{a.carFortyFivePhoto},#{a.createTime},#{a.progress})")
+            ",#{a.drivingLicenseCopy},#{a.vehicleRearPhoto},#{a.carFortyFivePhoto},#{a.createTime},#{a.progress})")
     int save(@Param("a") ApplyModel applyModel);
     @Delete("delete from apply_table where uuid = #{uuid}")
     int del(@Param("uuid") String uuid);

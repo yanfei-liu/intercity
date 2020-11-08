@@ -40,4 +40,11 @@ public class RouteServiceImpl implements RouteService {
     public List<RouteModel> findAll() {
         return mapper.findAll();
     }
+
+    @Override
+    public RouteModel getById(String uuid) {
+        return mapper.getById(uuid);
+    }
+
+
 }

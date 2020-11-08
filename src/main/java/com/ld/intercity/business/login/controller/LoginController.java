@@ -44,11 +44,12 @@ public class LoginController {
     @ResponseBody
     public HashMap<String, String> Init(@RequestParam("code") String code, HttpServletRequest request, HttpServletResponse response) {
         String str = "";
+        String identity = "1";
         HashMap<String, String> map = new HashMap<>();
         HashMap<String, String> map1 = new HashMap<>();
         try {
             //调用微信接口
-            String url = "https://api.weixin.qq.com/sns/jscode2session?appid=wxac052b4ee9437925&secret=1f7d119f7963362c5c8ea8fa7461796f&js_code=" + code + "&grant_type=authorization_code";
+            String url = "https://api.weixin.qq.com/sns/jscode2session?appid=wx9616cb5f7cfbe837&secret=2797b46b7d86f643b6235b2a53312663&js_code=" + code + "&grant_type=authorization_code";
             //获得返回字符串
             str = sendGet(url, "", null);
             //解析返回字符串
@@ -72,21 +73,22 @@ public class LoginController {
                     loginService.save(openId);
                     UserModel userModel = new UserModel();
                     userModel.setUuid(UUID.randomUUID().toString());
+                    userModel.setWeChatId(openId.getOpenId());
                     userModel.setIdentity("1");
                     userService.save(userModel);
-                    request.getSession().setAttribute("user",userModel);
-                    map1.put("identity",openId.getOpenId());
-                    map1.put("code","1001");
+                    map1.put("id",userModel.getUuid());
+                    map1.put("code","0");
                     map1.put("message","缺少电话号码");
                 }else {
                     UserModel byWeChatId = userService.getByWeChatId(openId.getOpenId());
-                    request.getSession().setAttribute("user",byWeChatId);
-                    map1.put("identity",byWeChatId.getIdentity());
+//                    map1.put("identity",byWeChatId.getIdentity());
+                    identity = byWeChatId.getIdentity();
+                    map1.put("id",byWeChatId.getUuid());
                     map1.put("code","0");
                     map1.put("message","成功");
                 }
                 String token = JWTUtils.creaToken(openId.getOpenId(), openId.getUuid(), openId.getSessionKey());
-                map1.put("data",token);
+                map1.put("data",identity + token);
             }else {
                 map1.put("code","1002");
                 map1.put("message","失败");

@@ -26,4 +26,11 @@ public interface RouteService {
      * @return
      */
     List<RouteModel> findAll();
+
+    /**
+     * 根据线路ID查询线路
+     * @param uuid
+     * @return
+     */
+    RouteModel getById(String uuid);
 }

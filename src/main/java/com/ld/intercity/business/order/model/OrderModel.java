@@ -1,13 +1,15 @@
 package com.ld.intercity.business.order.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  * 订单基础类
@@ -31,8 +33,12 @@ public class OrderModel {
     private String phone;
     @ApiModelProperty(value = "上车地点坐标", example = "坐标", required = true)
     private  String startCoordinate;
+    @ApiModelProperty(value = "上车地点", example = "地点", required = true)
+    private String startAddress;
     @ApiModelProperty(value = "下车地点坐标", example = "坐标", required = true)
     private String endCoordinate;
+    @ApiModelProperty(value = "下车地点", example = "地点", required = true)
+    private String endAddress;
     @ApiModelProperty(value = "出发省",required = true)
     private String startProvince;
     @ApiModelProperty(value = "出发市",required = true)
@@ -47,8 +53,10 @@ public class OrderModel {
     private String endCounty;
     @ApiModelProperty(value = "路线表id",required = true)
     private String routeId;
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty(value = "出发时间", example = "dateTime", required = true)
-    private LocalDateTime departureTime;
+    private Date departureTime;
     @ApiModelProperty(value = "乘坐人数", example = "数值", required = true)
     private String presionNumber;
     @ApiModelProperty(value = "是否包车",example = "0:不包车，1:包车")
@@ -57,20 +65,28 @@ public class OrderModel {
     private String charterCarType;
     @ApiModelProperty(value = "订单金额", example = "数值", required = true)
     private String orderAmount;
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty(value = "下单时间", example = "dateTime", required = true)
-    private LocalDateTime orderTime;
+    private Date orderTime;
     @ApiModelProperty(value = "接单人", example = "dateTime", required = true)
     private String jieDanPresion;
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty(value = "接单时间", example = "dateTime", required = true)
-    private LocalDateTime jieDanTime;
+    private Date jieDanTime;
     @ApiModelProperty(value = "订单状态", example = "0-已下单未接单 1-已接单未开始  2-已开始未结算  3-已结束未结算 4-已结束已结算  5-已取消", required = true)
     private String orderType;
     @ApiModelProperty(value = "下车地点坐标",example = "坐标")
     private String outCarCoordinate;
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty(value = "下车时间",example = "2020-9-26 20:08:10")
-    private LocalDateTime outCarTime;
+    private Date outCarTime;
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty(value = "结算时间", example = "dateTime", required = true)
-    private LocalDateTime settingTime;
+    private Date settingTime;
     @ApiModelProperty(value = "结算人", example = "结算用户主键", required = true)
     private String settingPresion;
     @ApiModelProperty(value = "是否删除",example = "0正常，1已删除",required = true)

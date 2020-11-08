@@ -3,6 +3,7 @@ package com.ld.intercity.business.apply.controller;
 import com.google.gson.Gson;
 import com.ld.intercity.business.apply.model.ApplyModel;
 import com.ld.intercity.business.apply.service.ApplyService;
+import com.ld.intercity.utils.ResponseResult;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -29,16 +30,10 @@ public class ApplyController {
     @ApiOperation("保存提交的申请")
     @RequestMapping(value = "save",method = RequestMethod.POST)
     @ResponseBody
-    public String save(@RequestBody ApplyModel applyModel){
+    public ResponseResult<String> save(@RequestBody ApplyModel applyModel){
         HashMap<String, String> map = new HashMap<>();
-        int save = applyService.save(applyModel);
-        if (save==1){
-            map.put("success","true");
-        }else {
-            map.put("success","false");
-        }
-        String s = toJson(map);
-        return s;
+        ResponseResult<String> save = applyService.save(applyModel);
+        return save;
     }
 
     /**
@@ -89,17 +84,18 @@ public class ApplyController {
     @ApiOperation("申请通过")
     @RequestMapping(value = "applyAdopt",method = RequestMethod.GET)
     @ResponseBody
-    public String applyAdopt(@PathVariable String passengerId){
+    public ResponseResult<String> applyAdopt(@RequestParam String passengerId){
+        ResponseResult<String> stringResponseResult = new ResponseResult<>();
         List<ApplyModel> byPassengerId = applyService.findByPassengerId(passengerId);
         for (ApplyModel app:byPassengerId){
-            if ("0".equals(app.getProgress())){
+            if (app.getProgress()==0){
+                app.setProgress(1);
                 applyService.update(app);
+                stringResponseResult.setSuccess(true);
+                stringResponseResult.setMessage("审核通过");
             }
         }
-        HashMap<String, String> map = new HashMap<>();
-        map.put("success","true");
-        String s = toJson(map);
-        return s;
+        return stringResponseResult;
     }
 
     /**
@@ -130,10 +126,18 @@ public class ApplyController {
     @ApiOperation("查询某用户提交的申请")
     @RequestMapping(value = "findByPassengerId",method = RequestMethod.POST)
     @ResponseBody
-    public String findByPassengerId(@RequestParam("passengerId") String passengerId){
+    public ResponseResult<List<ApplyModel>> findByPassengerId(@RequestParam("passengerId") String passengerId){
+        ResponseResult<List<ApplyModel>> applyModelResponseResult = new ResponseResult<>();
         List<ApplyModel> byPassengerId = applyService.findByPassengerId(passengerId);
-        String s = toJson(byPassengerId);
-        return s;
+        if (byPassengerId!=null&&byPassengerId.size()>0){
+            applyModelResponseResult.setSuccess(true);
+            applyModelResponseResult.setData(byPassengerId);
+            applyModelResponseResult.setMessage("查询成功");
+        }else {
+            applyModelResponseResult.setSuccess(false);
+            applyModelResponseResult.setMessage("我查询到申请记录");
+        }
+        return applyModelResponseResult;
     }
 
     /**

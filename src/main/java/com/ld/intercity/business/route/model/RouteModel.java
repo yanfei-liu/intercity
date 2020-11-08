@@ -48,4 +48,6 @@ public class RouteModel {
     private BigDecimal fiveSeatsPrice;
     @ApiModelProperty(value = "七座车包车价")
     private BigDecimal sevenSeatsPrice;
+    @ApiModelProperty(value = "是否删除")
+    private BigDecimal delFlag;
 }

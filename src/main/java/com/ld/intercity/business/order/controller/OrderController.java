@@ -5,18 +5,23 @@ import com.google.gson.Gson;
 import com.ld.intercity.business.order.model.OrderModel;
 import com.ld.intercity.business.order.service.OrderService;
 import com.ld.intercity.business.user.model.UserModel;
+import com.ld.intercity.business.user.service.UserService;
+import com.ld.intercity.utils.ResponseResult;
 import com.ld.intercity.utils.yaml.YamlPageUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.catalina.User;
+import org.apache.commons.lang.StringUtils;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @Api(value = "订单接口", tags = "订单相关操作接口")
 @Slf4j
@@ -26,13 +31,14 @@ public class OrderController {
 
     @Autowired
     private OrderService service;
+    @Autowired
+    private UserService userService;
 
     @ApiOperation(value = "订单生成")
     @RequestMapping(value = "/save",method = RequestMethod.POST)
     @ResponseBody
-    public String save(@RequestBody OrderModel orderModel
-            ,HttpServletRequest request){
-        Map save = service.save(orderModel, request);
+    public String save(@RequestBody OrderModel orderModel){
+        Map save = service.save(orderModel);
         Gson gson = new Gson();
         return gson.toJson(save);
     }
@@ -54,16 +60,33 @@ public class OrderController {
 
     /**
      * 司机去接单大厅检索订单
-     * @param orderModel    检索条件
-     * @return  json
+     * @param routeId    路线ID
+     * @param date    时间
+     * @param pageNo    当前页数
+     * @return  Re
      */
     @ApiOperation(value = "司机去接单大厅检索订单")
     @RequestMapping(value = "/findByDriverFindOrder",method = RequestMethod.POST)
     @ResponseBody
-    public String findByDriverFindOrder(@RequestBody OrderModel orderModel){
-        List<OrderModel> byDriverFindOrder = service.findByDriverFindOrder(orderModel);
-        Gson gson = new Gson();
-        return gson.toJson(byDriverFindOrder);
+    public ResponseResult<List<OrderModel>> findByDriverFindOrder(@RequestParam("routeId")String routeId,
+                                        @RequestParam("date")String date,
+                                        @RequestParam(value = "pageNo",required = false)String pageNo){
+        ResponseResult<List<OrderModel>> listResponseResult = new ResponseResult<>();
+        try {
+            if (StringUtils.isBlank(pageNo)){
+                pageNo = "1";
+            }
+            int i = Integer.parseInt(pageNo);
+            int pageSize = YamlPageUtils.getPageSize();
+            int i1 = (i - 1) * pageSize;
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            String s = date + " 00:00:00";
+            String s1 = date + " 23:59:59";
+            listResponseResult = service.findByDriverFindOrder(routeId, s, s1, i1, pageSize);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return listResponseResult;
     }
 
     /**
@@ -74,18 +97,31 @@ public class OrderController {
     @ApiOperation(value = "接单")
     @RequestMapping(value = "/updateJieDan",method = RequestMethod.GET)
     @ResponseBody
-    public String updateJieDan(@RequestParam String orderSn, HttpServletRequest request){
-        HashMap<String, String> map = new HashMap<>();
-        int upd = service.updateJieDan(orderSn,request);
+    public ResponseResult<String> updateJieDan(@RequestParam("orderSn") String orderSn,@RequestParam("uuid")String uuid){
+        ResponseResult<String> stringResponseResult = new ResponseResult<>();
+        int upd = service.updateJieDan(orderSn,uuid);
         if (upd==1){
-            map.put("success","true");
+            stringResponseResult.setSuccess(true);
+            stringResponseResult.setMessage("接单成功");
         }else {
-            map.put("success","false");
+            stringResponseResult.setSuccess(false);
+            stringResponseResult.setMessage("接单失败");
         }
-        Gson gson = new Gson();
-        return gson.toJson(map);
+        return stringResponseResult;
+    }
+    @ApiOperation(value = "接单记录")
+    @RequestMapping(value = "/findOrderByDriver",method = RequestMethod.GET)
+    @ResponseBody
+    public ResponseResult<List<OrderModel>> findOrderByDriver(@RequestParam("uuid") String uuid){
+        return service.findOrderByDriver(uuid);
     }
 
+    @ApiOperation(value = "查看司机接单后未完成的订单")
+    @RequestMapping(value = "/findBySiJiUserId",method = RequestMethod.GET)
+    @ResponseBody
+    public List<OrderModel> findBySiJiUserId(@Param("uuid") String uuid){
+        return service.getBySiJiUserId(uuid);
+    }
 
     /**
      * 完成订单
@@ -109,6 +145,18 @@ public class OrderController {
         }
         Gson gson = new Gson();
         return gson.toJson(map);
+    }
+
+    /**
+     * 订单结算
+     * @param orderSn   订单编号
+     * @return  ResponseResult
+     */
+    @ApiOperation(value = "订单结算")
+    @RequestMapping(value = "/orderSetting",method = RequestMethod.GET)
+    @ResponseBody
+    public ResponseResult<String> orderSetting(@RequestParam("orderSn") String orderSn){
+        return service.orderSetting(orderSn);
     }
 
     /**
@@ -147,11 +195,29 @@ public class OrderController {
     @ApiOperation(value = "查询全部订单")
     @RequestMapping(value = "/findAll",method = RequestMethod.GET)
     @ResponseBody
-    public String findAll(){
-        Gson gson = new Gson();
-        List<OrderModel> all = service.findAll();
-        String s = gson.toJson(all);
-        return s;
+    public ResponseResult<List<OrderModel>> findAll(@RequestParam(value = "userId",required = false) String userId,
+                          @RequestParam(value = "pageNo",required = false) String pageNo,
+                          @RequestParam(value = "pageSize",required = false) String pageSize){
+        ResponseResult<List<OrderModel>> stringResponseResult = new ResponseResult<>();
+        stringResponseResult.setSuccess(true);
+        if (StringUtils.isBlank(pageNo)){
+            pageNo = "0";
+        }
+        if (StringUtils.isBlank(pageSize)){
+            pageSize = "10";
+        }
+        int i = Integer.parseInt(pageNo);
+        int i2 = Integer.parseInt(pageSize);
+        if (StringUtils.isBlank(userId)){
+            List<OrderModel> all = service.findAll(i,i2);
+            if (all!=null&&all.size()>0){
+                stringResponseResult.setData(all);
+            }
+        }else {
+            List<OrderModel> allByUserId = service.findAllByUserId(userId, i, i2);
+            stringResponseResult.setData(allByUserId);
+        }
+        return stringResponseResult;
     }
 
     /**
@@ -162,14 +228,11 @@ public class OrderController {
     @ApiOperation(value = "根据传入状态查询各状态的全部订单")
     @RequestMapping(value = "/findAllByType",method = RequestMethod.GET)
     @ResponseBody
-    public String findAllByType(@ApiParam(value = "当前页数", required = true)
-                                              @PathVariable("pageNow") int pageNow,
+    public ResponseResult<List<OrderModel>> findAllByType(@ApiParam(value = "当前页数", required = true)
+                                              @RequestParam("pageNow") int pageNow,
                               @ApiParam(value = "0-已下单未接单 1-未开始已接单  2-已开始未结算  3-已结束未结算 4-已结束已结算  5-已取消",required = true)
-                              @PathVariable("type") String type){
-        PageInfo<OrderModel> allByType = service.findAllByType(pageNow, YamlPageUtils.getPageSize(), type);
-        Gson gson = new Gson();
-        String s = gson.toJson(allByType);
-        return s;
+                              @RequestParam("type") String type){
+        return service.findAllByType(pageNow, YamlPageUtils.getPageSize(), type);
     }
 
     /**
@@ -180,36 +243,66 @@ public class OrderController {
     @ApiOperation(value = "根据订单号查询单个订单")
     @RequestMapping(value = "/getOneByOrderSn",method = RequestMethod.GET)
     @ResponseBody
-    public String getOneByOrderSn(String orderSn){
+    public ResponseResult<OrderModel> getOneByOrderSn(@RequestParam String orderSn){
+        ResponseResult<OrderModel> orderModelResponseResult = new ResponseResult<>();
         OrderModel oneByOrderSn = service.getOneByOrderSn(orderSn);
-        Gson gson = new Gson();
-        String s = gson.toJson(oneByOrderSn);
-        return s;
+        if (oneByOrderSn!=null){
+            orderModelResponseResult.setSuccess(true);
+            orderModelResponseResult.setMessage("查询成功");
+            orderModelResponseResult.setData(oneByOrderSn);
+
+        }else {
+            orderModelResponseResult.setSuccess(false);
+            orderModelResponseResult.setMessage("查询失败");
+        }
+        return orderModelResponseResult;
     }
 
     /**
      * 根据用户ID查询客户未结算订单或者司机接单未完成订单
-     * @param request request
+     * @param uuid uuid
      * @return json
      */
     @ApiOperation(value = "根据用户ID查询客户未结算订单或者司机接单未完成订单")
     @RequestMapping(value = "/getByUserId",method = RequestMethod.GET)
     @ResponseBody
-    public String getByUserId(HttpServletRequest request){
-        UserModel user = (UserModel) request.getSession().getAttribute("user");
-        //客户，查看其生成的当前未结算订单
-        String identity = user.getIdentity();
-        String s = "";
-        Gson gson = new Gson();
-        if ("1".equals(identity)){
-            OrderModel byKeHuUserId = service.getByKeHuUserId(identity);
-            s = gson.toJson(byKeHuUserId);
+    public ResponseResult<List<OrderModel>> getByUserId(@RequestParam("uuid") String uuid){
+        ResponseResult<List<OrderModel>> orderModelResponseResult = new ResponseResult<>();
+        try {
+            ResponseResult<UserModel> responseResult = userService.getById(uuid);
+            UserModel user = responseResult.getData();
+            //客户，查看其生成的当前未结算订单
+            String identity = user.getIdentity();
+            String s = "";
+            HashMap<String, String> map = new HashMap<>();
+            List<OrderModel> byKeHuUserId = service.getByKeHuUserId(uuid);
+            if (byKeHuUserId==null||byKeHuUserId.size()==0){
+                orderModelResponseResult.setSuccess(false);
+                orderModelResponseResult.setMessage("没有待结算单");
+            }else {
+                orderModelResponseResult.setSuccess(true);
+                orderModelResponseResult.setMessage("当前有未结算订单");
+                orderModelResponseResult.setData(byKeHuUserId);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            orderModelResponseResult.setSuccess(false);
+            orderModelResponseResult.setMessage("查询出错");
         }
-        //司机，查看其接单的未结算订单
-        if ("2".equals(identity)){
-            List<OrderModel> bySiJiUserId = service.getBySiJiUserId(identity);
-            s = gson.toJson(bySiJiUserId);
-        }
-        return s;
+        return  orderModelResponseResult;
+    }
+
+    @ApiOperation("根据订单号更改订单状态")
+    @RequestMapping("updateOrderTypeByOrderSn")
+    @ResponseBody
+    public ResponseResult<String> updateOrderTypeByOrderSn(@RequestParam("orderSn") String orderSn,@RequestParam("type") String type){
+        return service.updateOrderTypeByOrderSn(orderSn, type);
+    }
+
+    @ApiOperation("乘客以下车")
+    @RequestMapping("updateOrderOutCar")
+    @ResponseBody
+    public ResponseResult<String> updateOrderOutCar(@RequestParam("orderSn")String orderSn,@RequestParam("coordinate")String coordinate){
+        return service.updateOrderOutCar(orderSn, coordinate);
     }
 }

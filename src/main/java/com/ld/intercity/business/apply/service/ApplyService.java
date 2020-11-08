@@ -1,11 +1,12 @@
 package com.ld.intercity.business.apply.service;
 
 import com.ld.intercity.business.apply.model.ApplyModel;
+import com.ld.intercity.utils.ResponseResult;
 
 import java.util.List;
 
 public interface ApplyService {
-    int save(ApplyModel applyModel);
+    ResponseResult<String> save(ApplyModel applyModel);
     int del(String uuid);
     int delByPassengerId(String passengerId);
     int update(ApplyModel applyModel);
