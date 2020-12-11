@@ -46,6 +46,8 @@ public class StatelessAuthcFilter extends AccessControlFilter {
 //        To get token,you can use head/Cokie or others.
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         String lTokenD = request.getHeader("LTokenD");
+        String account = request.getHeader("account");
+        String orgid = request.getHeader("orgid");
         log.info("全局拦截器url:" + request.getRequestURI());
         log.info("全局拦截器token:" + lTokenD);
         if (lTokenD == null || lTokenD.isEmpty())
@@ -55,6 +57,11 @@ public class StatelessAuthcFilter extends AccessControlFilter {
             token.setToken(lTokenD);
             try {
                 getSubject(servletRequest, servletResponse).login(token);
+                String s = JWTUtils.creaToken(account, orgid, orgid);
+                HttpServletResponse response = (HttpServletResponse) servletResponse;
+                response.setHeader("LTokenD",s);
+                response.setHeader("account",account);
+                response.setHeader("orgid",orgid);
                 return true;
             } catch (Exception e) {
                 tokenError(servletRequest, servletResponse);

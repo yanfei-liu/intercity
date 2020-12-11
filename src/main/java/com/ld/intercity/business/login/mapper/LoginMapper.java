@@ -13,4 +13,7 @@ public interface LoginMapper {
 
     @Insert("insert into login_table (uuid,openId,account,password,sessionKey) values (#{l.uuid},#{l.openId},#{l.account},#{l.password},#{l.sessionKey})")
     int save(@Param("l") Login login);
+
+    @Select("select uuid,account,password from login_table where account = #{account}")
+    Login getByAccount(@Param("account") String account);
 }

@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <title>bootstrap-table - 光年(Light Year Admin)后台管理系统模板</title>
+    <link rel="icon" href="/static/Light-Year-Admin-Using-Iframe/favicon.ico" type="image/ico">
+    <meta name="keywords" content="LightYear,光年,后台模板,后台管理系统,光年HTML模板">
+    <meta name="description" content="LightYear是一个基于Bootstrap v3.3.7的后台管理系统的HTML模板。">
+    <meta name="author" content="yinqi">
+    <link href="/static/Light-Year-Admin-Using-Iframe/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/Light-Year-Admin-Using-Iframe/css/materialdesignicons.min.css" rel="stylesheet">
+    <link href="/static/Light-Year-Admin-Using-Iframe/css/animate.css" rel="stylesheet">
+    <link href="/static/Light-Year-Admin-Using-Iframe/css/style.min.css" rel="stylesheet">
+    <link href="/static/Light-Year-Admin-Using-Iframe/js/bootstrap-table/bootstrap-table.min.css" rel="stylesheet">
+    <!--对话框-->
+    <link rel="stylesheet" href="/static/Light-Year-Admin-Using-Iframe/js/jconfirm/jquery-confirm.min.css">
+    <link href="/static/Light-Year-Admin-Using-Iframe/css/style.min.css" rel="stylesheet">
+</head>
+
+<body>
+<div class="container-fluid p-t-15">
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header"><h4>订单查询</h4></div>
+                <div class="card-body">
+
+                    <form class="form-horizontal" action="#" method="post" enctype="multipart/form-data" onsubmit="return false;">
+                        <div class="form-group">
+                            <div class="row">
+                                <label class="col-xs-1">订单编号</label>
+                                <div class="col-xs-3">
+                                    <input class="form-control" type="text" id="orderSn" name="orderSn" placeholder="订单编号">
+                                </div>
+                                <label class="col-xs-1">订单路线</label>
+                                <div class="col-xs-3">
+                                    <select class="form-control" id="routId" name="routId" size="1">
+                                        <option value="">请选择</option>
+                                    </select>
+                                </div>
+                                <label class="col-xs-1">订单状态</label>
+                                <div class="col-xs-3">
+                                    <select class="form-control" id="type" name="type" size="1">
+                                        <option value="">请选择</option>
+                                        <option value="0">已下单未接单</option>
+                                        <option value="1">已接单未开始</option>
+                                        <option value="2">已开始未完成</option>
+                                        <option value="3">已完成未结算</option>
+                                        <option value="4">已结算已完结</option>
+                                        <option value="5">已作废</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-xs-12">
+                                <button class="btn btn-primary" type="button" onclick="query()">提交</button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <table id="tb_departments"></table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" src="/static/Light-Year-Admin-Using-Iframe/js/jquery.min.js"></script>
+<script type="text/javascript" src="/static/Light-Year-Admin-Using-Iframe/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="/static/Light-Year-Admin-Using-Iframe/js/perfect-scrollbar.min.js"></script>
+<script type="text/javascript" src="/static/Light-Year-Admin-Using-Iframe/js/bootstrap-table/bootstrap-table.min.js"></script>
+<script type="text/javascript" src="/static/Light-Year-Admin-Using-Iframe/js/bootstrap-table/bootstrap-table-zh-CN.min.js"></script>
+
+<!--行内编辑插件-->
+<link href="/static/Light-Year-Admin-Using-Iframe/js/x-editable/1.5.1/bootstrap3-editable/css/bootstrap-editable.min.css" rel="stylesheet">
+<script type="text/javascript" src="/static/Light-Year-Admin-Using-Iframe/js/x-editable/1.5.1/bootstrap3-editable/js/bootstrap-editable.min.js"></script>
+<script type="text/javascript" src="/static/Light-Year-Admin-Using-Iframe/js/bootstrap-table/extensions/editable/bootstrap-table-editable.min.js"></script>
+
+<script type="text/javascript" src="/static/Light-Year-Admin-Using-Iframe/js/main.min.js"></script>
+
+<!--对话框-->
+<script src="/static/Light-Year-Admin-Using-Iframe/js/jconfirm/jquery-confirm.min.js"></script>
+<script type="/static/Light-Year-Admin-Using-Iframe/text/javascript" src="js/main.min.js"></script>
+<script type="text/javascript">
+    var i = 0;
+    function query() {
+        var val = $("#orderSn").val();
+        var val1 = $("#routId").val();
+        var val2 = $("#type").val();
+        if (i==0){
+            $('#tb_departments').bootstrapTable({
+                classes: 'table table-bordered table-hover table-striped',
+                url: "/order/findOrderByQueryBack?val=" + val + "&val1=" + val1 + "&val2=" + val2,
+                method: 'get',
+                dataType : 'json',        // 因为本示例中是跨域的调用,所以涉及到ajax都采用jsonp,
+                uniqueId: 'id',
+                idField: 'id',             // 每行的唯一标识字段
+                toolbar: '#toolbar',       // 工具按钮容器
+                //clickToSelect: true,     // 是否启用点击选中行
+                showColumns: true,         // 是否显示所有的列
+                showRefresh: true,         // 是否显示刷新按钮
+
+                //showToggle: true,        // 是否显示详细视图和列表视图的切换按钮(clickToSelect同时设置为true时点击会报错)
+
+                pagination: true,                    // 是否显示分页
+                sortOrder: "asc",                    // 排序方式
+                queryParams: function(params) {
+                    var temp = {
+                        limit: params.limit,         // 每页数据量
+                        offset: params.offset,       // sql语句起始索引
+                        page: (params.offset / params.limit) + 1,
+                    };
+                    return temp;
+                },                                   // 传递参数
+                sidePagination: "server",            // 分页方式：client客户端分页，server服务端分页
+                pageNumber: 1,                       // 初始化加载第一页，默认第一页
+                pageSize: 10,                        // 每页的记录行数
+                pageList: [10, 25, 50, 100],         // 可供选择的每页的行数
+                //search: true,                      // 是否显示表格搜索，此搜索是客户端搜索
+
+                //showExport: true,        // 是否显示导出按钮, 导出功能需要导出插件支持(tableexport.min.js)
+                //exportDataType: "basic", // 导出数据类型, 'basic':当前页, 'all':所有数据, 'selected':选中的数据
+
+                columns: [
+                    {
+                        field: 'orderSn',
+                        title: '订单单号'
+                    }, {
+                        field: 'startProvince',
+                        title: '起始地省',
+                    }, {
+                        field: 'startCity',
+                        title: '起始地市',
+                    }, {
+                        field: 'startCounty',
+                        title: '起始地区县',
+                    }, {
+                        field: 'endProvince',
+                        title: '目的地省',
+                    }, {
+                        field: 'endCity',
+                        title: '目的地市',
+                    }, {
+                        field: 'endCounty',
+                        title: '目的地区县',
+                    }, {
+                        field: 'startAddress',
+                        title: '上车地点'
+                    }, {
+                        field: 'endAddress',
+                        title: '下车地点'
+                    }, {
+                        field: 'departureTime',
+                        title: '出发时间'
+                    }, {
+                        field: 'createName',
+                        title: '创建人'
+                    }, {
+                        field: 'orderType',
+                        title: '订单状态',
+                        formatter: orderType,  // 自定义方法
+                    }, {
+                        field: 'operate',
+                        title: '操作',
+                        formatter: btnGroup,  // 自定义方法
+                        events: {
+                            'click .show-btn': function (event, value, row, index) {
+                                showUser(row.orderSn);
+                            },
+                            'click .del-btn': function (event, value, row, index) {
+                                delUser(row.orderSn);
+                            }
+                        }
+                    }],
+                onLoadSuccess: function(data){
+                    $("[data-toggle='tooltip']").tooltip();
+                }
+            });
+            i++;
+        }else {
+            //重新加载数据
+            $('#tb_departments').bootstrapTable('refresh',{url: "/order/findOrderByQueryBack?val=" + val + "&val1=" + val1 + "&val2=" + val2});
+        }
+    }
+    //时间
+    //转换日期格式(时间戳转换为datetime格式)
+    function changeDateFormat(cellval) {
+        var dateVal = cellval + "";
+        if (cellval != null) {
+            var date = new Date(parseInt(dateVal.replace("/Date(", "").replace(")/", ""), 10));
+            var month = date.getMonth() + 1 < 10 ? "0" + (date.getMonth() + 1) : date.getMonth() + 1;
+            var currentDate = date.getDate() < 10 ? "0" + date.getDate() : date.getDate();
+
+            var hours = date.getHours() < 10 ? "0" + date.getHours() : date.getHours();
+            var minutes = date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes();
+            var seconds = date.getSeconds() < 10 ? "0" + date.getSeconds() : date.getSeconds();
+
+            return date.getFullYear() + "-" + month + "-" + currentDate + " " + hours + ":" + minutes + ":" + seconds;
+        }
+    }
+
+    //状态
+    function orderType(value, row, index) {
+        if (row.orderType == 0)return "已下单未结单";
+        if (row.orderType == 1)return "已接单未开始";
+        if (row.orderType == 2)return "已开始未完成";
+        if (row.orderType == 3)return "已完成未结算";
+        if (row.orderType == 4)return "已结算已结束";
+        if (row.orderType == 5)return "已作废";
+    }
+
+    // 操作按钮
+    function btnGroup ()
+    {
+        let html =
+            '<a href="#!" class="btn btn-xs btn-default m-r-5 show-btn" title="查看" data-toggle="tooltip"><i class="mdi mdi-eye"></i></a>' +
+            '<a href="#!" class="btn btn-xs btn-default del-btn" title="作废" data-toggle="tooltip"><i class="mdi mdi-window-close"></i></a>';
+        return html;
+    }
+
+    // 操作方法 - 删除
+    function delUser(orderSn)
+    {
+        $.ajax({
+            url:"/order/del?orderSn=" + orderSn,    //请求的url地址
+            async:true,//请求是否异步，默认为异步，这也是ajax重要特性
+            type:"GET",   //请求方式
+            beforeSend:function(){
+                //请求前的处理
+            },
+            success:function(req){
+                //请求成功时处理
+                var success = req.success;
+                var message = req.message;
+                if (success == true){
+                    $.alert({
+                        title: '成功',
+                        content: '订单作废成功',
+                        buttons: {
+                            confirm: {
+                                text: '确认',
+                                btnClass: 'btn-primary',
+                                action: function(){
+                                    query();
+                                }
+                            }
+                        }
+                    });
+                }else {
+                    $.confirm({
+                        title: '警告',
+                        content: message,
+                        type: 'orange',
+                        typeAnimated: false,
+                        buttons: {
+                            close: {
+                                text: '关闭'
+                            }
+                        }
+                    });
+                }
+            },
+            complete:function(){
+                //请求完成的处理
+            },
+            error:function(){
+                //请求出错处理
+            }
+        });
+    }
+    // 操作方法 - 查看
+    function showUser(orderSn)
+    {
+        $.ajax({
+            url:"/order/getOneByOrderSn?orderSn=" + orderSn,    //请求的url地址
+            async:true,//请求是否异步，默认为异步，这也是ajax重要特性
+            type:"GET",   //请求方式
+            beforeSend:function(){
+                //请求前的处理
+            },
+            success:function(req){
+                //请求成功时处理
+                var success = req.success;
+                var message = req.message;
+                if (success == true){
+                    var data = req.data;
+                    var html = '<form class="form-horizontal" action="#" method="post" enctype="multipart/form-data" onsubmit="return false;">' +
+                        '  <div class="form-group">' +
+                        '    <label class="col-xs-10" for="example-text-input">订单编号</label>' +
+                        '    <div class="col-xs-10">' +
+                        '      <input class="form-control" type="text" id="orderSn" name="orderSn" value="'+data.orderSn+'">' +
+                        '    </div>' +
+                        '  </div>' +
+                        '  <div class="form-group">' +
+                        '    <label class="col-xs-10" for="example-text-input">创建人称谓</label>' +
+                        '    <div class="col-xs-10">' +
+                        '      <input class="form-control" type="text" id="createName" name="createName" value="'+data.createName+'">' +
+                        '    </div>' +
+                        '  </div>' +
+                        '  <div class="form-group">' +
+                        '    <label class="col-xs-10" for="example-text-input">创建人电话</label>' +
+                        '    <div class="col-xs-10">' +
+                        '      <input class="form-control" type="text" id="phone" name="phone" value="'+data.phone+'">' +
+                        '    </div>' +
+                        '  </div>' +
+                        '  <div class="form-group">' +
+                        '    <label class="col-xs-10" for="example-text-input">上车地点</label>' +
+                        '    <div class="col-xs-10">' +
+                        '      <input class="form-control" type="text" id="startAddress" name="startAddress" value="'+data.startAddress+'">' +
+                        '    </div>' +
+                        '  </div>' +
+                        '  <div class="form-group">' +
+                        '    <label class="col-xs-10" for="example-text-input">下车地点</label>' +
+                        '    <div class="col-xs-10">' +
+                        '      <input class="form-control" type="text" id="endAddress" name="endAddress" value="'+data.endAddress+'">' +
+                        '    </div>' +
+                        '  </div>' +
+                        '  <div class="form-group">' +
+                        '    <label class="col-xs-10" for="example-text-input">路线</label>' +
+                        '    <div class="col-xs-10">' +
+                        '      <input class="form-control" type="text" id="route" name="route" ' +
+                        'value="'+data.startProvince+data.startCity+data.startCounty+'-'+data.endProvince+data.endCity+data.endCounty+'">' +
+                        '    </div>' +
+                        '  </div>' +
+                        '  <div class="form-group">' +
+                        '    <label class="col-xs-10" for="example-text-input">出发时间</label>' +
+                        '    <div class="col-xs-10">' +
+                        '      <input class="form-control" type="text" id="departureTime" name="departureTime" value="'+data.departureTime+'">' +
+                        '    </div>' +
+                        '  </div>' +
+                        '  <div class="form-group">' +
+                        '    <label class="col-xs-10" for="example-text-input">乘坐人数</label>' +
+                        '    <div class="col-xs-10">' +
+                        '      <input class="form-control" type="text" id="presionNumber" name="presionNumber" value="'+data.presionNumber+'">' +
+                        '    </div>' +
+                        '  </div>' +
+                        '  <div class="form-group">' +
+                        '    <label class="col-xs-10" for="example-text-input">是否包车</label>' +
+                        '    <div class="col-xs-10">' +
+                        '      <input class="form-control" type="text" id="isCharterCar" name="isCharterCar" value="'+data.isCharterCar+'">' +
+                        '    </div>' +
+                        '  </div>' +
+                        '  <div class="form-group">' +
+                        '    <label class="col-xs-10" for="example-text-input">包车车型</label>' +
+                        '    <div class="col-xs-10">' +
+                        '      <input class="form-control" type="text" id="charterCarType" name="charterCarType" value="'+data.charterCarType+'">' +
+                        '    </div>' +
+                        '  </div>' +
+                        '  <div class="form-group">' +
+                        '    <label class="col-xs-10" for="example-text-input">订单金额</label>' +
+                        '    <div class="col-xs-10">' +
+                        '      <input class="form-control" type="text" id="orderAmount" name="orderAmount" value="'+data.orderAmount+'">' +
+                        '    </div>' +
+                        '  </div>' +
+                        '  <div class="form-group">' +
+                        '    <label class="col-xs-10" for="example-text-input">下单时间</label>' +
+                        '    <div class="col-xs-10">' +
+                        '      <input class="form-control" type="text" id="orderTime" name="orderTime" value="'+data.orderTime+'">' +
+                        '    </div>' +
+                        '  </div>' +
+                        '  <div class="form-group">' +
+                        '    <label class="col-xs-10" for="example-text-input">接单人</label>' +
+                        '    <div class="col-xs-10">' +
+                        '      <input class="form-control" type="text" id="jieDanPresion" name="jieDanPresion" value="'+data.jieDanPresion+'">' +
+                        '    </div>' +
+                        '  </div>' +
+                        '  <div class="form-group">' +
+                        '    <label class="col-xs-10" for="example-text-input">接单时间</label>' +
+                        '    <div class="col-xs-10">' +
+                        '      <input class="form-control" type="text" id="jieDanTime" name="jieDanTime" value="'+data.jieDanTime+'">' +
+                        '    </div>' +
+                        '  </div>' +
+                        '  <div class="form-group">' +
+                        '    <label class="col-xs-10" for="example-text-input">订单状态</label>' +
+                        '    <div class="col-xs-10">' +
+                        '      <input class="form-control" type="text" id="orderType" name="orderType" value="'+data.orderType+'">' +
+                        '    </div>' +
+                        '  </div>' +
+                        '  <div class="form-group">' +
+                        '    <label class="col-xs-10" for="example-text-input">结算时间</label>' +
+                        '    <div class="col-xs-10">' +
+                        '      <input class="form-control" type="text" id="settingTime" name="settingTime" value="'+data.settingTime+'">' +
+                        '    </div>' +
+                        '  </div>' +
+                        '  <div class="form-group">' +
+                        '    <label class="col-xs-10" for="example-text-input">结算人</label>' +
+                        '    <div class="col-xs-10">' +
+                        '      <input class="form-control" type="text" id="settingPresion" name="settingPresion" value="'+data.settingPresion+'">' +
+                        '    </div>' +
+                        '  </div>' +
+                        '</form>';
+                    $.alert({
+                        title: '订单详情',
+                        content: html,
+                        buttons: {
+                            cancel: {
+                                text: '关闭',
+                            }
+                        }
+                    });
+                }else {
+                    $.confirm({
+                        title: '警告',
+                        content: message,
+                        type: 'orange',
+                        typeAnimated: false,
+                        buttons: {
+                            close: {
+                                text: '关闭'
+                            }
+                        }
+                    });
+                }
+            },
+            complete:function(){
+                //请求完成的处理
+            },
+            error:function(){
+                //请求出错处理
+            }
+        });
+    }
+</script>
+</body>
+</html>

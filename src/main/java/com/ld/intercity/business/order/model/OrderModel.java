@@ -75,7 +75,7 @@ public class OrderModel {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty(value = "接单时间", example = "dateTime", required = true)
     private Date jieDanTime;
-    @ApiModelProperty(value = "订单状态", example = "0-已下单未接单 1-已接单未开始  2-已开始未结算  3-已结束未结算 4-已结束已结算  5-已取消", required = true)
+    @ApiModelProperty(value = "订单状态", example = "0-已下单未接单 1-已接单未开始  2-已开始未结算  3-已结束未结算 4-已结束已结算  5-已取消  6已退款", required = true)
     private String orderType;
     @ApiModelProperty(value = "下车地点坐标",example = "坐标")
     private String outCarCoordinate;
@@ -91,4 +91,9 @@ public class OrderModel {
     private String settingPresion;
     @ApiModelProperty(value = "是否删除",example = "0正常，1已删除",required = true)
     private String delFlag;
+
+    // 保留字段
+    private String str1;
+    private String str2;
+    private String str3;
 }

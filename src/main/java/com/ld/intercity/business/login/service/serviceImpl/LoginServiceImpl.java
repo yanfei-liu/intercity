@@ -16,6 +16,11 @@ public class LoginServiceImpl implements LoginService {
     }
 
     @Override
+    public Login getByAccount(String account) {
+        return loginMapper.getByAccount(account);
+    }
+
+    @Override
     public int save(Login login) {
         return loginMapper.save(login);
     }

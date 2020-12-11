@@ -86,12 +86,15 @@ public class ShiroConfiguration {
 //拦截器
         Map<String, String> filterChainDefinitionMap = new LinkedHashMap<>();
         filterChainDefinitionMap.put("/", "anon");
+        filterChainDefinitionMap.put("/userLogin/Init", "anon");
+        filterChainDefinitionMap.put("/userLogin/login", "anon");
         filterChainDefinitionMap.put("/v2/**", "anon");
         filterChainDefinitionMap.put("/login/**", "anon");
         filterChainDefinitionMap.put("/favicon.ico", "anon");
         filterChainDefinitionMap.put("/swagger2-ui.html", "anon");
         filterChainDefinitionMap.put("/swagger-ui.html", "anon");
         filterChainDefinitionMap.put("/swagger-resources/**", "anon");
+        filterChainDefinitionMap.put("/static/Light-Year-Admin-Using-Iframe/**", "anon");
         filterChainDefinitionMap.put("/v2/**", "anon");
         filterChainDefinitionMap.put("/webjars/**", "anon");
 //        filterChainDefinitionMap.put("/**", "statelessAuthcFilter");

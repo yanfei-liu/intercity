@@ -25,7 +25,7 @@ public interface OrderService {
      * @param orderSn  订单编号
      * @return map
      */
-    Map del(String orderSn);
+    ResponseResult<String> del(String orderSn);
 
     /**
      * 修改订单
@@ -118,4 +118,6 @@ public interface OrderService {
      * @return  int
      */
     ResponseResult<String> updateOrderOutCar(String orderSn,String coordinate);
+
+    ResponseResult<List<OrderModel>> findOrderByQuery(String val, String val1, String val2) throws Exception;
 }

@@ -3,6 +3,7 @@ package com.ld.intercity.business.address.controller;
 import com.google.gson.Gson;
 import com.ld.intercity.business.address.model.AddressModel;
 import com.ld.intercity.business.address.service.AddressService;
+import com.ld.intercity.utils.ResponseResult;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,16 +30,17 @@ public class AddressController {
      * @param addressModel 实体类
      * @return int
      */
-    public String save(AddressModel addressModel){
-        HashMap<String, String> map = new HashMap<>();
+    public ResponseResult<String> save(AddressModel addressModel){
+        ResponseResult<String> stringResponseResult = new ResponseResult<>();
         int save = addressService.save(addressModel);
         if (save==1){
-            map.put("success","true");
+            stringResponseResult.setSuccess(true);
+            stringResponseResult.setMessage("保存成功");
         }else {
-            map.put("success","false");
+            stringResponseResult.setSuccess(false);
+            stringResponseResult.setMessage("保存失败");
         }
-        String s = toJson(map);
-        return s;
+        return stringResponseResult;
     }
 
     /**

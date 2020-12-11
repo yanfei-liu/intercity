@@ -11,8 +11,9 @@ import org.springframework.stereotype.Component;
 @Mapper
 @Component
 public interface OrderCancelMapper {
-    @Insert("insert into order_cancel_table (uuid,order_sn,cancel_user_id,cancel_time,del_flag) values (#{oc.uuid},#{oc.orderSn},#{oc.cancelUserId},#{oc.cancelTime},#{oc.delFlag})")
-    int save(@Param("oc") OrderCancelModel orderCancelModel);
+    @Insert("insert into order_cancel_table (uuid,order_sn,cancel_user_id,cancel_time,del_flag) values" +
+            " (#{uuid},#{orderSn},#{cancelUserId},#{cancelTime},#{delFlag})")
+    int save(OrderCancelModel orderCancelModel);
 
     @Select("select uuid,order_sn as orderSn,cancel_user_id as cancelUserId,cancel_time as cancelTime,del_flag as delFlag from order_cancel_table " +
             "where cancel_user_id = #{userId} and del_flag = '0'")

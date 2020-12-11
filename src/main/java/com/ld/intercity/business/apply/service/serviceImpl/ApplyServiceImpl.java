@@ -7,6 +7,8 @@ import com.ld.intercity.business.order.model.OrderModel;
 import com.ld.intercity.business.order.service.OrderService;
 import com.ld.intercity.business.user.model.UserModel;
 import com.ld.intercity.business.user.service.UserService;
+import com.ld.intercity.business.wallet.model.WalletModel;
+import com.ld.intercity.business.wallet.service.WalletService;
 import com.ld.intercity.utils.ResponseResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,8 @@ public class ApplyServiceImpl implements ApplyService {
     private OrderService orderService;
     @Autowired
     private UserService userService;
+    @Autowired
+    private WalletService walletService;
 
     @Override
     @Transactional
@@ -91,6 +95,12 @@ public class ApplyServiceImpl implements ApplyService {
             UserModel data = byId.getData();
             data.setIdentity("2");
             userService.updateById(data);
+            //  生成司机钱包账户
+            WalletModel walletModel = new WalletModel();
+            walletModel.setUuid(UUID.randomUUID().toString());
+            walletModel.setUserId(data.getUserId());
+            walletModel.setWalletAmount("0");
+            walletService.save(walletModel);
             return applyMapper.update(applyModel);
         }catch (Exception e){
             e.printStackTrace();
@@ -106,5 +116,16 @@ public class ApplyServiceImpl implements ApplyService {
     @Override
     public List<ApplyModel> findAllByType(String type) {
         return applyMapper.findAllByType(type);
+    }
+
+    @Override
+    public List<ApplyModel> findAllByParamBack(String val, String val1, String val2) {
+        return applyMapper.findAllByParamBack(val, val1, val2);
+    }
+
+    @Override
+    public ApplyModel getByUuid(String uuid) throws Exception{
+        ApplyModel byUuid = applyMapper.getByUuid(uuid);
+        return byUuid;
     }
 }

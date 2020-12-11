@@ -1,6 +1,7 @@
 package com.ld.intercity.business.order.dao;
 
 import com.github.pagehelper.Page;
+import com.ld.intercity.business.order.dao.sql.OrderMapperSql;
 import com.ld.intercity.business.order.model.OrderModel;
 import com.ld.intercity.utils.ResponseResult;
 import org.apache.ibatis.annotations.*;
@@ -24,7 +25,7 @@ public interface OrderMapper {
      * @param orderSn  订单编号
      * @return int
      */
-    @Delete("delete from order_main where order_sn = #{orderSn}")
+    @Update("update order_table set order_type = '5' where order_sn = #{orderSn}")
     int del(@Param("orderSn") String orderSn);
 
     /**
@@ -178,4 +179,7 @@ public interface OrderMapper {
     @Update("update order_table set order_type = #{o.orderType},out_car_coordinate = #{o.outCarCoordinate}," +
             "out_car_time = #{o.outCarTime} where order_sn = #{o.orderSn} and  del_flag = 0")
     int updateOrderOutCar(@Param("o")OrderModel orderModel);
+
+    @SelectProvider(type = OrderMapperSql.class,method = "findOrderByQuery")
+    List<OrderModel> findOrderByQuery(@Param("orderModel") OrderModel orderModel) throws Exception;
 }

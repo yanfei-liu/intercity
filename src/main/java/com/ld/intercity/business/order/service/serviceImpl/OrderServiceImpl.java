@@ -7,6 +7,8 @@ import com.ld.intercity.business.order.service.OrderCancelService;
 import com.ld.intercity.business.order.service.OrderService;
 import com.ld.intercity.business.route.model.RouteModel;
 import com.ld.intercity.business.route.service.RouteService;
+import com.ld.intercity.business.wallet.model.WalletModel;
+import com.ld.intercity.business.wallet.service.WalletService;
 import com.ld.intercity.utils.ResponseResult;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +28,8 @@ public class OrderServiceImpl implements OrderService {
     private OrderCancelService orderCancelService;
     @Autowired
     private RouteService routeService;
+    @Autowired
+    private WalletService walletService;
     @Override
     @Transactional
     public Map save(OrderModel orderModel) {
@@ -40,10 +44,10 @@ public class OrderServiceImpl implements OrderService {
             int i = 0;
             //  判断是否存在一分钟内取消的订单
             if (byUserId != null){
-                LocalDateTime cancelTime = byUserId.getCancelTime();
-                LocalDateTime now = LocalDateTime.now();
-                Duration between = Duration.between(now, cancelTime);
-                if (between.toMinutes()<=1){
+                Date cancelTime = byUserId.getCancelTime();
+                Date date = new Date();
+                long l = (date.getTime() - cancelTime.getTime()) / 1000 / 60;
+                if (l<=1){    //  取消时间与下单时间小于一分钟
                     map.put("code","1001");
                     map.put("msg","请等待1分钟后再下单");
                 }else {
@@ -104,39 +108,37 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public Map del(String orderSn) {
-        Map<String, String> map = new HashMap<>();
+    public ResponseResult<String> del(String orderSn) {
+        ResponseResult<String> stringResponseResult = new ResponseResult<>();
         //  查询被取消的订单
         OrderModel oneByOrderSn = getOneByOrderSn(orderSn);
         //  下单一分钟内不得取消
         Date orderTime = oneByOrderSn.getOrderTime();
-        Instant instant = orderTime.toInstant();
-        ZoneId zoneId = ZoneId.systemDefault();
-        LocalDateTime localDateTime = instant.atZone(zoneId).toLocalDateTime();
-        Duration between = Duration.between(LocalDateTime.now(), localDateTime);
-        if (between.toMinutes()<=1){    //  取消时间与下单时间小于一分钟
-            map.put("code","1001");
-            map.put("msg","下单后一分钟内不得取消订单");
+        Date date = new Date();
+        long l = (date.getTime() - orderTime.getTime()) / 1000 / 60;
+        if (l<=1){    //  取消时间与下单时间小于一分钟
+            stringResponseResult.setSuccess(false);
+            stringResponseResult.setMessage("下单后一分钟内不得取消订单");
         }else if ("2".equals(oneByOrderSn.getOrderType())||"3".equals(oneByOrderSn.getOrderType())||"4".equals(oneByOrderSn.getOrderType())){
-            map.put("code","1002");
-            map.put("msg","当前订单状态不可取消，请联系人工客服");
+            stringResponseResult.setSuccess(false);
+            stringResponseResult.setMessage("当前订单状态不可取消，请联系人工客服");
         }else if ("5".equals(oneByOrderSn.getOrderType())){
-            map.put("code","1003");
-            map.put("msg","该订单已取消");
+            stringResponseResult.setSuccess(false);
+            stringResponseResult.setMessage("该订单已取消");
         } else {
             //  添加取消记录
             OrderCancelModel orderCancelModel = new OrderCancelModel();
             orderCancelModel.setUuid(UUID.randomUUID().toString());
             orderCancelModel.setOrderSn(orderSn);
             orderCancelModel.setCancelUserId(oneByOrderSn.getCreatePresion());
-            orderCancelModel.setCancelTime(LocalDateTime.now());
+            orderCancelModel.setCancelTime(new Date());
             orderCancelModel.setDelFlag("0");
             orderCancelService.save(orderCancelModel);
             orderMapper.del(orderSn);
-            map.put("code","0");
-            map.put("msg","订单已成功取消，请于1分钟后再次下单");
+            stringResponseResult.setSuccess(true);
+            stringResponseResult.setMessage("订单已成功取消，请于1分钟后再次下单");
         }
-        return map;
+        return stringResponseResult;
     }
 
     @Override
@@ -221,7 +223,19 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public ResponseResult<String> orderSetting(String orderSn) {
+        //  查询订单
+        OrderModel oneByOrderSn = getOneByOrderSn(orderSn);
+        //  更改订单状态
         int i = orderMapper.orderSetting(orderSn);
+        //  查询接单人员账户信息
+        WalletModel byUserId = walletService.getByUserId(oneByOrderSn.getJieDanPresion());
+        BigDecimal bigDecimal = new BigDecimal(byUserId.getWalletAmount());
+        BigDecimal bigDecimal1 = new BigDecimal(oneByOrderSn.getOrderAmount());
+        //  接单人员账户余额加上订单金额
+        BigDecimal add = bigDecimal.add(bigDecimal1);
+        byUserId.setWalletAmount(add.toString());
+        //  更改接单人员的账户余额
+        walletService.update(byUserId);
         ResponseResult<String> stringResponseResult = new ResponseResult<>();
         if (i==1){
             stringResponseResult.setSuccess(true);
@@ -265,5 +279,22 @@ public class OrderServiceImpl implements OrderService {
             stringResponseResult.setMessage("乘客下车记录失败,请再次尝试");
         }
         return stringResponseResult;
+    }
+
+    @Override
+    public ResponseResult<List<OrderModel>> findOrderByQuery(String val, String val1, String val2) throws Exception {
+        ResponseResult<List<OrderModel>> listResponseResult = new ResponseResult<>();
+        OrderModel orderModel = new OrderModel();
+        orderModel.setOrderSn(val);
+        orderModel.setRouteId(val1);
+        orderModel.setOrderType(val2);
+        List<OrderModel> orderByQuery = orderMapper.findOrderByQuery(orderModel);
+        if (orderByQuery!=null&&orderByQuery.size()>0){
+            listResponseResult.setSuccess(true);
+            listResponseResult.setData(orderByQuery);
+        }else {
+            listResponseResult.setSuccess(false);
+        }
+        return listResponseResult;
     }
 }

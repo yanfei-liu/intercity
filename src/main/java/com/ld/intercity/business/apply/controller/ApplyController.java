@@ -5,9 +5,12 @@ import com.ld.intercity.business.apply.model.ApplyModel;
 import com.ld.intercity.business.apply.service.ApplyService;
 import com.ld.intercity.utils.ResponseResult;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -21,6 +24,13 @@ public class ApplyController {
         Gson gson = new Gson();
         String s = gson.toJson(o);
         return s;
+    }
+
+    @ApiOperation("后台审核申请页")
+    @RequestMapping(value = "/Init")
+    @ResponseBody
+    public ModelAndView Init(){
+        return new ModelAndView("/pages/apply/apply.html");
     }
     /**
      * 保存提交的申请
@@ -78,22 +88,61 @@ public class ApplyController {
 
     /**
      * 申请通过
-     * @param passengerId
+     * @param uuid
      * @return int
      */
     @ApiOperation("申请通过")
     @RequestMapping(value = "applyAdopt",method = RequestMethod.GET)
     @ResponseBody
-    public ResponseResult<String> applyAdopt(@RequestParam String passengerId){
+    public ResponseResult<String> applyAdopt(@RequestParam String uuid){
         ResponseResult<String> stringResponseResult = new ResponseResult<>();
-        List<ApplyModel> byPassengerId = applyService.findByPassengerId(passengerId);
-        for (ApplyModel app:byPassengerId){
-            if (app.getProgress()==0){
-                app.setProgress(1);
-                applyService.update(app);
+        try {
+            ApplyModel  byPassengerId = applyService.getByUuid(uuid);
+            if (byPassengerId.getProgress()==0){
+                byPassengerId.setProgress(1);
+                applyService.update(byPassengerId);
                 stringResponseResult.setSuccess(true);
                 stringResponseResult.setMessage("审核通过");
+            }else {
+                stringResponseResult.setSuccess(false);
+                stringResponseResult.setMessage("该审核操作已被完成");
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+            stringResponseResult.setSuccess(false);
+            stringResponseResult.setMessage("审核操作出错，请稍后再试");
+        }
+        return stringResponseResult;
+    }
+
+    /**
+     * 拒绝通过
+     * @param uuid
+     * @return int
+     */
+    @ApiOperation("拒绝通过")
+    @RequestMapping(value = "applyRefuse",method = RequestMethod.GET)
+    @ResponseBody
+    public ResponseResult<String> applyRefuse(@RequestParam String uuid){
+        ResponseResult<String> stringResponseResult = new ResponseResult<>();
+        try {
+        ApplyModel byPassengerId = null;
+            byPassengerId = applyService.getByUuid(uuid);
+            if (byPassengerId.getProgress()==0){
+                byPassengerId.setProgress(5);
+                int update = applyService.update(byPassengerId);
+                if (update == 1) {
+                    stringResponseResult.setSuccess(true);
+                    stringResponseResult.setMessage("成功拒绝通过");
+                }else {
+                    stringResponseResult.setSuccess(false);
+                    stringResponseResult.setMessage("拒绝通过失败");
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            stringResponseResult.setSuccess(false);
+            stringResponseResult.setMessage("拒绝通过失败");
         }
         return stringResponseResult;
     }
@@ -152,5 +201,52 @@ public class ApplyController {
         List<ApplyModel> allByType = applyService.findAllByType(type);
         String s = toJson(allByType);
         return s;
+    }
+
+
+    @ApiOperation("后台根据参数查询司机申请")
+    @RequestMapping(value = "findAllByParamBack",method = RequestMethod.GET)
+    @ResponseBody
+    public String findAllByParamBack(@RequestParam("val") String val,
+                                     @RequestParam("val1") String val1,
+                                     @RequestParam("val2") String val2,
+                                     @RequestParam("limit")String limit,
+                                     @RequestParam("offset")String offset,
+                                     @RequestParam("page")String page){
+        Gson gson = new Gson();
+        HashMap<String, Object> stringObjectHashMap = new HashMap<>();
+        if (StringUtils.isNotBlank(val)||StringUtils.isNotBlank(val1)||StringUtils.isNotBlank(val2)){
+            List<ApplyModel> allByParamBack = applyService.findAllByParamBack(val, val1, val2);
+            int i = Integer.parseInt(offset);
+            int i1 = Integer.parseInt(limit);
+            if (i1>allByParamBack.size()){
+                i1 = allByParamBack.size();
+            }
+            List<ApplyModel> applyModels = allByParamBack.subList(i, i1);
+            stringObjectHashMap.put("total",allByParamBack.size());
+            stringObjectHashMap.put("rows",applyModels);
+        }else {
+            stringObjectHashMap.put("total",0);
+            stringObjectHashMap.put("rows",new ArrayList<>());
+        }
+        String s = gson.toJson(stringObjectHashMap);
+        return s;
+    }
+
+    @ApiOperation("后台根据UUID查询司机申请")
+    @RequestMapping(value = "getByUuid",method = RequestMethod.GET)
+    @ResponseBody
+    public ResponseResult<ApplyModel> getByUuid(String uuid){
+        ResponseResult<ApplyModel> applyModelResponseResult = new ResponseResult<>();
+        try {
+            ApplyModel byUuid = applyService.getByUuid(uuid);
+            applyModelResponseResult.setSuccess(true);
+            applyModelResponseResult.setData(byUuid);
+        } catch (Exception e) {
+            e.printStackTrace();
+            applyModelResponseResult.setSuccess(false);
+            applyModelResponseResult.setMessage("查询异常，请稍后再试");
+        }
+        return applyModelResponseResult;
     }
 }

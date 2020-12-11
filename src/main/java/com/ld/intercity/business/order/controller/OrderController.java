@@ -17,6 +17,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import java.text.ParseException;
@@ -34,6 +35,20 @@ public class OrderController {
     @Autowired
     private UserService userService;
 
+    @ApiOperation(value = "订单查询")
+    @RequestMapping(value = "/Init")
+    @ResponseBody
+    public ModelAndView Init(){
+        return new ModelAndView("/pages/order/order.html");
+    }
+
+    @ApiOperation(value = "订单详情查询")
+    @RequestMapping(value = "/Init2")
+    @ResponseBody
+    public ModelAndView Init2(){
+        return new ModelAndView("/pages/order/orderDetails.html");
+    }
+
     @ApiOperation(value = "订单生成")
     @RequestMapping(value = "/save",method = RequestMethod.POST)
     @ResponseBody
@@ -43,6 +58,64 @@ public class OrderController {
         return gson.toJson(save);
     }
 
+    @ApiOperation(value = "根据指定条件进行订单查询")
+    @RequestMapping(value = "/findOrderByQuery",method = RequestMethod.GET)
+    @ResponseBody
+    public ResponseResult<List<OrderModel>> findOrderByQuery(
+            @RequestParam("val") String val,
+            @RequestParam("val1") String val1,
+            @RequestParam("val2") String val2){
+        ResponseResult<List<OrderModel>> orderByQuery = new ResponseResult<>();
+        try {
+            orderByQuery = service.findOrderByQuery(val, val1, val2);
+        } catch (Exception e) {
+            e.printStackTrace();
+            orderByQuery.setSuccess(false);
+        }
+        return orderByQuery;
+    }
+
+    @ApiOperation(value = "根据指定条件进行订单查询-后端")
+    @RequestMapping(value = "/findOrderByQueryBack",method = RequestMethod.GET)
+    @ResponseBody
+    public String findOrderByQueryBack(
+            @RequestParam("val") String val,
+            @RequestParam("val1") String val1,
+            @RequestParam("val2") String val2,
+            @RequestParam("limit")String limit,
+            @RequestParam("offset")String offset,
+            @RequestParam("page")String page){
+        Gson gson = new Gson();
+        HashMap<String, Object> stringObjectHashMap = new HashMap<>();
+        if (StringUtils.isBlank(val)&&StringUtils.isBlank(val1)&&StringUtils.isBlank(val2)){
+            stringObjectHashMap.put("total",0);
+            stringObjectHashMap.put("rows",new ArrayList<>());
+        }else {
+            try {
+                ResponseResult<List<OrderModel>> orderByQuery = service.findOrderByQuery(val, val1, val2);
+                if (orderByQuery.isSuccess()){
+                    List<OrderModel> data = orderByQuery.getData();
+                    int toIndex = Integer.parseInt(offset);
+                    int fromIndex = Integer.parseInt(limit);
+                    if (fromIndex > data.size()) {
+                        fromIndex = data.size();
+                    }
+                    List<OrderModel> orderModels = data.subList(toIndex,fromIndex);
+                    stringObjectHashMap.put("total",data.size());
+                    stringObjectHashMap.put("rows",orderModels);
+                }else {
+                    stringObjectHashMap.put("total",0);
+                    stringObjectHashMap.put("rows",new ArrayList<>());
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                stringObjectHashMap.put("total",0);
+                stringObjectHashMap.put("rows",new ArrayList<>());
+            }
+        }
+        String s = gson.toJson(stringObjectHashMap);
+        return s;
+    }
 
     /**
      * 删除订单
@@ -52,10 +125,8 @@ public class OrderController {
     @ApiOperation(value = "删除订单")
     @RequestMapping(value = "/del",method = RequestMethod.GET)
     @ResponseBody
-    public String del(@RequestParam String orderSn){
-        Map del = service.del(orderSn);
-        Gson gson = new Gson();
-        return gson.toJson(del);
+    public ResponseResult<String> del(@RequestParam String orderSn){
+        return service.del(orderSn);
     }
 
     /**
