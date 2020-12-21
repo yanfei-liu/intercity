@@ -98,7 +98,7 @@ public class ApplyServiceImpl implements ApplyService {
             //  生成司机钱包账户
             WalletModel walletModel = new WalletModel();
             walletModel.setUuid(UUID.randomUUID().toString());
-            walletModel.setUserId(data.getUserId());
+            walletModel.setUserId(data.getUuid());
             walletModel.setWalletAmount("0");
             walletService.save(walletModel);
             return applyMapper.update(applyModel);

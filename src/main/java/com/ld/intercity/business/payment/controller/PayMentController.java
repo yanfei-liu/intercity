@@ -1,13 +1,21 @@
 package com.ld.intercity.business.payment.controller;
 
+import com.google.gson.Gson;
 import com.ld.intercity.business.order.model.OrderModel;
 import com.ld.intercity.business.order.service.OrderService;
 import com.ld.intercity.business.payment.utils.HttpClientUtil;
 import com.ld.intercity.business.payment.utils.WXPayConstants;
 import com.ld.intercity.business.payment.utils.WXPayUtil;
+import com.ld.intercity.business.user.model.UserModel;
+import com.ld.intercity.business.user.service.UserService;
 import com.ld.intercity.utils.ResponseResult;
+import io.swagger.annotations.Api;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -17,15 +25,19 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-
+@Slf4j
 @RequestMapping("/PayMent")
+@RestController
 public class PayMentController {
+    @Autowired
     private OrderService orderService;
+    @Autowired
+    private UserService userService;
 
     /*调用支付接口*/
-    @RequestMapping("prePay")
+    @RequestMapping("/prePay")
     @ResponseBody
-    public Map<String, Object> prePay(String orderSn, HttpServletRequest request){
+    public Map<String, Object> prePay(@RequestParam("orderSn") String orderSn, HttpServletRequest request){
 
         // 返回参数
         Map<String, Object> resMap = new HashMap<>();
@@ -52,9 +64,12 @@ public class PayMentController {
             OrderModel oneByOrderSn = orderService.getOneByOrderSn(orderSn);
             String body = oneByOrderSn.getRouteId();//商品名称
             String orderNum = oneByOrderSn.getOrderSn();//订单号
-            String openId = oneByOrderSn.getCreatePresion();
+            ResponseResult<UserModel> byId = userService.getById(oneByOrderSn.getCreatePresion());
+            UserModel data = byId.getData();
+            String openId = data.getWeChatId();
             String money = oneByOrderSn.getOrderAmount();
-            BigDecimal bigDecimal = new BigDecimal(money);
+            BigDecimal bigDecimal = new BigDecimal(money).multiply(new BigDecimal("100"));
+            int round = Math.round(bigDecimal.floatValue());
 //       Integer price = 1;//支付金额，单位：分，这边需要转成字符串类型，否则后面的签名会失败
             System.out.println("body= "+body);
 //       body = new String(body.getBytes("ISO-8859-1"),"UTF-8").toString();
@@ -65,11 +80,12 @@ public class PayMentController {
             paraMap.put("nonce_str", WXPayUtil.generateNonceStr());//获取随机字符串 Nonce Str
             paraMap.put("body", body);     //商品名称
             paraMap.put("out_trade_no", orderNum);//订单号
-            paraMap.put("total_fee",bigDecimal.toString());    //测试改为固定金额
-            paraMap.put("spbill_create_ip", ip);
+            paraMap.put("total_fee",Integer.toString(round));
+            paraMap.put("spbill_create_ip", "106.117.100.71");
             paraMap.put("notify_url",WXPayConstants.CALLBACK_URL);// 此路径是微信服务器调用支付结果通知路径
             paraMap.put("trade_type", "JSAPI");
             paraMap.put("openid", openId);
+            paraMap.put("profit_sharing", "Y");
             String sign = WXPayUtil.generateSignature(paraMap, WXPayConstants.PATERNER_KEY);//商户密码
             //生成签名. 注意，若含有sign_type字段，必须和signType参数保持一致。
             paraMap.put("sign", sign);
@@ -114,7 +130,7 @@ public class PayMentController {
     }
 
     /*支付成功回调*/
-    @RequestMapping("callBack")
+    @RequestMapping("/callBack")
     public ResponseResult<String> callBack(HttpServletRequest request, HttpServletResponse response){
         ResponseResult<String> result = new ResponseResult<>();
         System.err.println("微信支付成功,微信发送的callback信息,请注意修改订单信息");
@@ -126,6 +142,8 @@ public class PayMentController {
             Map<String, String> notifyMap = WXPayUtil.xmlToMap(xml);//将微信发的xml转map
             if(notifyMap.get("return_code").equals("SUCCESS")){
                 String ordersNum = notifyMap.get("out_trade_no").toString();//商户订单号
+                String transactionId = notifyMap.get("transaction_id").toString();//微信支付订单号
+                String totalFee = notifyMap.get("total_fee").toString();//订单金额
                 //处理订单状态
                 try {
                     orderService.orderSetting(ordersNum);
@@ -141,6 +159,59 @@ public class PayMentController {
                     out.close();
                     System.err.println("返回给微信的值："+resXml.getBytes());
                     is.close();
+                    //添加分账账号
+                    Map<String, String> paraMap = new HashMap<>();
+                    OrderModel oneByOrderSn = orderService.getOneByOrderSn(ordersNum);
+                    ResponseResult<UserModel> byId = userService.getById(oneByOrderSn.getJieDanPresion());
+                    String weChatId = byId.getData().getWeChatId();
+                    paraMap.put("mch_id",WXPayConstants.MCH_ID);
+                    paraMap.put("appid",WXPayConstants.APP_ID);
+                    paraMap.put("nonce_str", WXPayUtil.generateNonceStr());//获取随机字符串 Nonce Str
+                    String sign = WXPayUtil.generateSignature(paraMap, WXPayConstants.PATERNER_KEY);//商户密码
+                    //生成签名. 注意，若含有sign_type字段，必须和signType参数保持一致。
+                    paraMap.put("sign", sign);
+                    HashMap<String, Object> stringObjectHashMap = new HashMap<>();
+                    stringObjectHashMap.put("type","PERSONAL_OPENID");
+                    stringObjectHashMap.put("account",weChatId);
+                    stringObjectHashMap.put("relation_type","STAFF");
+                    Gson gson = new Gson();
+                    String s = gson.toJson(stringObjectHashMap);
+                    paraMap.put("receiver", s);
+                    String s1 = WXPayUtil.mapToXml(paraMap);
+                    String add_separate_accounts_url = WXPayConstants.add_separate_accounts_url;
+                    String xmlStr = HttpClientUtil.doPostXml(add_separate_accounts_url, s1);
+                    if (xmlStr.indexOf("SUCCESS") != -1) {
+                        Map<String, String> map = WXPayUtil.xmlToMap(xmlStr);//XML格式字符串转换为Map
+                        paraMap.clear();
+                        paraMap.put("mch_id",WXPayConstants.MCH_ID);
+                        paraMap.put("appid",WXPayConstants.APP_ID);
+                        paraMap.put("nonce_str", WXPayUtil.generateNonceStr());//获取随机字符串 Nonce Str
+                        String sign1 = WXPayUtil.generateSignature(paraMap, WXPayConstants.PATERNER_KEY);//商户密码
+                        //生成签名. 注意，若含有sign_type字段，必须和signType参数保持一致。
+                        paraMap.put("sign", sign1);
+                        paraMap.put("transaction_id",transactionId);
+                        paraMap.put("out_order_no",ordersNum);
+                        BigDecimal bigDecimal = new BigDecimal(totalFee);
+                        HashMap<String, Object> stringObjectHashMap1 = new HashMap<>();
+                        stringObjectHashMap1.put("type","PERSONAL_OPENID");
+                        stringObjectHashMap1.put("account",weChatId);
+                        stringObjectHashMap1.put("amount",bigDecimal.intValue());
+                        stringObjectHashMap1.put("description","分到个人");
+                        String s2 = gson.toJson(stringObjectHashMap);
+                        paraMap.put("receivers",s2);
+                        String s3 = WXPayUtil.mapToXml(paraMap);
+                        String single_account_sharing_url = WXPayConstants.single_account_sharing_url;
+                        String s4 = HttpClientUtil.doPostXml(single_account_sharing_url, s3);
+                        // TODO 解析分账返回结果保存信息
+                        Map<String, String> stringStringMap = WXPayUtil.xmlToMap(s4);
+                        HashMap<String, String> stringObjectHashMap2 = new HashMap<>();
+                        stringObjectHashMap2.put("sub_mchid",WXPayConstants.MCH_ID);
+                        stringObjectHashMap2.put("transaction_id",transactionId);
+                        stringObjectHashMap2.put("out_order_no",stringStringMap.get("out_order_no").toString());
+                        stringObjectHashMap2.put("description","分账到个人");
+                        String s5 = WXPayUtil.mapToXml(stringObjectHashMap2);
+                        String s6 = HttpClientUtil.doPostXml(WXPayConstants.end_of_split_account_url, s5);
+                    }
                 }catch (Exception e){
                     result.setMessage("订单状态修改失败");
                 }

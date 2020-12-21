@@ -15,11 +15,15 @@ public class WXPayConstants {
     public static final String OPENID_URL = "https://api.weixin.qq.com/sns/oauth2/access_token";
     public static final String NOTIFY_URL = "106.117.100.71";//回调ip
     public static final String UNIFIEDORDER_URL = "https://api.mch.weixin.qq.com/pay/unifiedorder";//统一下单接口
-    public static final String CALLBACK_URL = "https://106.117.100.71:9000/PayMent/callBack";//微信服务器调用支付结果通知路径
+    public static final String CALLBACK_URL = "http://3h517648u8.wicp.vip/PayMent/callBack";//微信服务器调用支付结果通知路径
     public static final String PATERNER_KEY = "d1dd5db0454b69d7a1abf4a3f3e10176";//商户key秘钥   填写你们自己的
     /*退款*/
     public static final String REFUND_URL = "https://api.mch.weixin.qq.com/secapi/pay/refund";//申请退款路径接口
-    public static final String notify_url = "https://106.117.100.71:9000/wxPay/notifyUrl";//微信服务器调用退款结果通知路径
+    public static final String notify_url = "https://106.117.100.71/wxPay/notifyUrl";//微信服务器调用退款结果通知路径
+    /*分账*/
+    public static final String add_separate_accounts_url = "https://api.mch.weixin.qq.com/pay/profitsharingaddreceiver";//添加分账接收方接口
+    public static final String single_account_sharing_url = "https://api.mch.weixin.qq.com/pay/profitsharingaddreceiver";//单次分账接口
+    public static final String end_of_split_account_url = "https://api.mch.weixin.qq.com/v3/ecommerce/profitsharing/finish-order";//单次分账接口
 
 
     public enum SignType {

@@ -32,8 +32,9 @@
                         <li class="nav-item nav-item-has-subnav">
                             <a href="javascript:void(0)"><i class="mdi mdi-palette"></i> <span>业务</span></a>
                             <ul class="nav nav-subnav">
-                                <li> <a class="multitabs" href="/order/Init">订单查询</a> </li>
-                                <li> <a class="multitabs" href="/apply/Init">司机申请审核</a> </li>
+                                <li> <a class="multitabs nav-link" data-id="/order/Init">订单查询</a> </li>
+                                <li> <a class="multitabs nav-link" data-id="/apply/Init">司机申请审核</a> </li>
+                                <li> <a class="multitabs nav-link" data-id="/wallet/walletRecord/Init">提现申请记录</a> </li>
                             </ul>
                         </li>
                     </ul>
@@ -210,5 +211,74 @@
 <script type="text/javascript" src="/static/Light-Year-Admin-Using-Iframe/js/perfect-scrollbar.min.js"></script>
 <script type="text/javascript" src="/static/Light-Year-Admin-Using-Iframe/js/bootstrap-multitabs/multitabs.js"></script>
 <script type="text/javascript" src="/static/Light-Year-Admin-Using-Iframe/js/index.min.js"></script>
+<script type="text/javascript">
+    var Toast;
+    $(function () {
+        let t = sessionStorage.getItem("LTokenD")
+        if (!t) {
+            window.location.href = window.origin + "/pages/lyear_pages_login.html"
+        }
+//    全局设置
+        $.ajaxSetup({
+            timeout: 2000,
+            dataType: "json",
+            beforeSend: function (request) {
+                debugger;
+                request.setRequestHeader("LTokenD", sessionStorage.getItem("LTokenD"));
+            },
+            success: function (response, status, xhr) {
+                debugger;
+                //响应头部
+                let to = xhr.getResponseHeader("LTokenD")
+                if (to != null) {
+                    sessionStorage.setItem("LTokenD", to);
+                }
+            },
+            error: function (err) {
+                debugger;
+                console.log(err)
+                if (err.status === 404) {
+                    alter2(4, "资源不存在")
+                } else {
+                    if (err.responseJSON.success !== undefined && !err.responseJSON.success) {
+                        if (err.responseJSON.data === 'logout') {
+                            alter2(4, err.responseJSON.msg + "3秒后跳转登录页")
+                            $('div').remove()
+                            setTimeout(function () {
+                                window.location.href = window.origin + "/pages/lyear_pages_login.html"
+                            }, 3000);
+                        } else if (err.responseJSON.data === '!admin') {
+                            alter2(4, err.responseJSON.msg)
+                        } else {
+                            alter2(4, err.responseJSON.msg)
+                        }
+                    } else {
+                        alter2(4, "资源错误")
+                    }
+                }
+            }
+        });
+        //----------------------------------------------------------------------
+
+        //注销登录
+        $("#logout").click(function () {
+            sessionStorage.clear()
+            window.location.href = window.origin + "/pages/lyear_pages_login.html"
+        })
+
+//    菜单点击跳转
+        $(".nav-link").on("click", function () {
+            let id = $(this).attr("data-id")
+            if (id) {
+                $.ajax(id, {
+                    type: "GET",
+                    dataType: 'html'
+                }).done(function (e) {
+                    $("#iframe-content").html(e);
+                })
+            }
+        })
+    })
+</script>
 </body>
 </html>

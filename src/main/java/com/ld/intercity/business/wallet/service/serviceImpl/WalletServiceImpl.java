@@ -3,9 +3,12 @@ package com.ld.intercity.business.wallet.service.serviceImpl;
 import com.ld.intercity.business.wallet.mapper.WalletMapper;
 import com.ld.intercity.business.wallet.model.WalletModel;
 import com.ld.intercity.business.wallet.service.WalletService;
+import com.ld.intercity.utils.ResponseResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
 
 @Service
 @Transactional(readOnly = true)

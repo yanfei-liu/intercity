@@ -32,13 +32,13 @@ public interface UserMapper {
     void updateById(@Param("model") UserModel model) throws SQLException;
 
     @Select({
-            "select * from " + TABLE_NAME + " where uuid = #{uuid}"
+            "select uuid,we_chat_id as weChatId,identity as identity,phone as phone,user_id as userId from " + TABLE_NAME + " where uuid = #{uuid}"
     })
     UserModel getById(@Param("uuid") String uuid) throws SQLException;
 
     @SelectProvider(type = UserMapperSql.class, method = "findAll")
     Page<UserModel> findAll(@Param("model") UserModel model) throws SQLException;
 
-    @Select("select * from " + TABLE_NAME + " where we_chat_id = #{weChatId}")
+    @Select("select uuid,we_chat_id as weChatId,identity as identity,phone as phone,user_id as userId from " + TABLE_NAME + " where we_chat_id = #{weChatId}")
     UserModel getByWeChatId(String weChatId)throws SQLException;
 }

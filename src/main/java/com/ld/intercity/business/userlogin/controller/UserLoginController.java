@@ -50,29 +50,30 @@ public class UserLoginController {
             Login byAccount = loginService.getByAccount(account);
             if (byAccount!=null){
                 if (md5Password.equals(byAccount.getPassword())){
-                    String token = JWTUtils.creaToken(byAccount.getAccount(), byAccount.getPassword(),byAccount.getUuid());
+                    String token = JWTUtils.creaToken(byAccount.getAccount(), byAccount.getUuid(),byAccount.getUuid());
                     modelAndView.addObject("success",true);
                     modelAndView.addObject("msg","登陆成功");
-                    modelAndView.addObject("token",token);
                     response.setHeader("LTokenD",token);
+                    response.setHeader("account",byAccount.getAccount());
+                    response.setHeader("orgid",byAccount.getUuid());
                     modelAndView.setViewName("/pages/home/home.html");
                     return modelAndView;
                 }else {
                     modelAndView.addObject("msg","账号或密码错误");
                     modelAndView.addObject("success",false);
-                    modelAndView.setViewName("/pages/backLogin.html");
+                    modelAndView.setViewName("/pages/lyear_pages_login.html");
                     return modelAndView;
                 }
             }else {
                 modelAndView.addObject("msg","该账号不存在");
                 modelAndView.addObject("success",false);
-                modelAndView.setViewName("/pages/backLogin.html");
+                modelAndView.setViewName("/pages/lyear_pages_login.html");
                 return modelAndView;
             }
         }else {
             modelAndView.addObject("msg","账号或密码不可为空");
             modelAndView.addObject("success",false);
-            modelAndView.setViewName("/pages/backLogin.html");
+            modelAndView.setViewName("/pages/lyear_pages_login.html");
             return modelAndView;
         }
     }
